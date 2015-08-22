@@ -1,6 +1,7 @@
-package main.java.of_2015.chess.game;
+package chess.game;
 
-import main.java.of_2015.chess.ai.Opponent;
+
+import chess.ai.Opponent;
 
 import java.util.Scanner;
 import java.util.Set;

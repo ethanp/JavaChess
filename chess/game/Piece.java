@@ -1,4 +1,4 @@
-package main.java.of_2015.chess.game;
+package chess.game;
 
 import java.util.HashSet;
 import java.util.Optional;

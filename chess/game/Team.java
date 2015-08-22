@@ -1,4 +1,4 @@
-package main.java.of_2015.chess.game;
+package chess.game;
 
 /**
  * Ethan Petuchowski 7/7/15
