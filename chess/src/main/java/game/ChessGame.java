@@ -1,7 +1,7 @@
-package chess.game;
+package game;
 
 
-import chess.ai.Opponent;
+import ai.Opponent;
 
 import java.util.Scanner;
 import java.util.Set;
@@ -25,7 +25,7 @@ public class ChessGame {
 
     /** FIELDS **/
 
-    final Board board;
+    public final Board board;
     private final Scanner sc = new Scanner(System.in);
     private final Opponent opponent;
 
@@ -122,7 +122,7 @@ public class ChessGame {
         return false;
     }
 
-    boolean lost() {
+    public boolean lost() {
         boolean whiteLost = gameOverFor(Team.WHITE);
         if (whiteLost) {
             System.out.println("YOU LOST!");
@@ -130,7 +130,7 @@ public class ChessGame {
         return whiteLost;
     }
 
-    boolean won() {
+    public boolean won() {
         boolean whiteWon = gameOverFor(Team.BLACK);
         if (whiteWon) {
             System.out.println("YOU WON!");

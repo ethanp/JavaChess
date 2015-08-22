@@ -1,10 +1,10 @@
-package chess.ai;
+package ai;
 
-import chess.game.Board;
-import chess.game.BoardLoc;
-import chess.game.BoardCommand;
-import chess.game.Piece;
-import chess.game.Team;
+import game.Board;
+import game.BoardCommand;
+import game.BoardLoc;
+import game.Piece;
+import game.Team;
 
 import java.util.Optional;
 

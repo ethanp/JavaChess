@@ -1,6 +1,4 @@
-package chess.game;
-
-import chess.game.BoardLoc;
+package game;
 
 /**
  * Ethan Petuchowski 7/7/15

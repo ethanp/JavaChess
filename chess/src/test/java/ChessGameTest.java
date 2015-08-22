@@ -1,5 +1,9 @@
-package chess.game;
-
+import game.Board;
+import game.BoardCommand;
+import game.BoardLoc;
+import game.ChessGame;
+import game.Piece;
+import game.Team;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +13,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 
 /**
  * Ethan Petuchowski 7/22/15

@@ -1,4 +1,4 @@
-package chess.game;
+package game;
 
 /**
  * Ethan Petuchowski 8/21/15
