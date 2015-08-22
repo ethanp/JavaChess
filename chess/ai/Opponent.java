@@ -1,10 +1,10 @@
-package main.java.of_2015.chess.ai;
+package chess.ai;
 
-import main.java.of_2015.chess.game.Board;
-import main.java.of_2015.chess.game.BoardLoc;
-import main.java.of_2015.chess.game.BoardCommand;
-import main.java.of_2015.chess.game.Piece;
-import main.java.of_2015.chess.game.Team;
+import chess.game.Board;
+import chess.game.BoardLoc;
+import chess.game.BoardCommand;
+import chess.game.Piece;
+import chess.game.Team;
 
 import java.util.Optional;
 
