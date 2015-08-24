@@ -1,5 +1,6 @@
 package game;
 
+import game.AbstractCommand.BoardCommand;
 import game.CommandLineRenderer.CoordinateCommandLineRenderer;
 
 import java.util.Collection;

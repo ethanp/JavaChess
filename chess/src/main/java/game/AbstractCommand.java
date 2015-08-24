@@ -3,7 +3,7 @@ package game;
 /**
  * Ethan Petuchowski 8/21/15
  */
-abstract class AbstractCommand {
+public abstract class AbstractCommand {
 
     public static AbstractCommand parse(String console) {
         if (console.equalsIgnoreCase("undo")) {
@@ -25,6 +25,41 @@ abstract class AbstractCommand {
 
         public static UndoCommandSingleton getInstance() {
             return instance;
+        }
+
+        @Override public String toString() {
+            return "UndoCommandSingleton";
+        }
+    }
+
+    public static class BoardCommand extends AbstractCommand {
+
+        // they can be public because they're Immutable
+        public final BoardLoc from;
+        public final BoardLoc to;
+
+        public BoardCommand(BoardLoc from, BoardLoc to) {
+            this.from = from;
+            this.to = to;
+        }
+
+        /**
+         * Note: calling this will not in itself restore any pieces that were
+         *       eaten by the original move
+         */
+        public BoardCommand opposite() {
+            return new BoardCommand(to, from);
+        }
+
+        public int distance() {
+            return Math.max(
+                Math.abs(from.row-to.row),
+                Math.abs(from.col-to.col)
+            );
+        }
+
+        @Override public String toString() {
+            return "BoardCommand{"+"from="+from+", to="+to+'}';
         }
     }
 }

@@ -1,7 +1,10 @@
 package game;
 
 
+import ai.HumanPlayer;
 import ai.Opponent;
+import ai.Player;
+import game.AbstractCommand.BoardCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,18 +23,20 @@ public class ChessGame {
 
     /** MAIN **/
 
+    static final Logger logger = LoggerFactory.getLogger(ChessGame.class);
+
     public static void main(String[] args) {
-        final Logger logger = LoggerFactory.getLogger(ChessGame.class);
         logger.error("STARTING! {}", logger);
-        ChessGame.consoleInterpreted();
+        ChessGame.humanVsGreedyAI();
     }
 
 
     /** FIELDS **/
 
     public final Board board;
-    private final Scanner sc = new Scanner(System.in);
-    private final Opponent opponent;
+    private static final Scanner sc = new Scanner(System.in);
+    private final Player player1;
+    private final Opponent player2;
 
 
     /** CONSTRUCTORS **/
@@ -42,7 +47,14 @@ public class ChessGame {
 
     public ChessGame(Board board) {
         this.board = board;
-        this.opponent = new Opponent(board);
+        this.player1 = new HumanPlayer(sc);
+        this.player2 = new Opponent(board);
+    }
+
+    public ChessGame(Player player1, Player player2) {
+        this.board = new Board();
+        this.player1 = player1;
+        this.player2 = new Opponent(board);
     }
 
 
@@ -55,8 +67,8 @@ public class ChessGame {
 
     /** METHODS **/
 
-    private static void consoleInterpreted() {
-        new ChessGame().startInterpreter();
+    private static void humanVsGreedyAI() {
+        new ChessGame(new HumanPlayer(sc), new Opponent.GreedyAI()).startInterpreter();
     }
 
     private void startInterpreter() {
@@ -65,23 +77,25 @@ public class ChessGame {
             AbstractCommand command = promptForInput();
             if (command == AbstractCommand.UndoCommandSingleton.getInstance()) {
                 if (board.canUndoMove()) {
-                    board.undoMove(); // undo opponent's last move
+                    board.undoMove(); // undo player2's last move
                     board.undoMove(); // undo your own last move
-                    continue;
                 } else {
                     System.err.println("There are no moves to undo.");
                 }
             }
-            if (command instanceof BoardCommand) {
+            else if (command instanceof BoardCommand) {
                 board.execute((BoardCommand) command);
                 if (won() || stalemate(Team.BLACK)) {
                     return;
                 }
                 board.draw();
-                opponent.move();
+                player2.move();
                 if (lost() || stalemate(Team.WHITE)) {
                     return;
                 }
+            }
+            else {
+                logger.error("invalid command {}", command);
             }
         }
     }
