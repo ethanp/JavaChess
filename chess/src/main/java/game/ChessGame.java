@@ -2,8 +2,9 @@ package game;
 
 
 import ai.HumanPlayer;
-import ai.Opponent;
+import ai.AIPlayer;
 import ai.Player;
+import ai.Strategy;
 import game.AbstractCommand.BoardCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class ChessGame {
     public final Board board;
     private static final Scanner sc = new Scanner(System.in);
     private final Player player1;
-    private final Opponent player2;
+    private final AIPlayer player2;
 
 
     /** CONSTRUCTORS **/
@@ -48,13 +49,13 @@ public class ChessGame {
     public ChessGame(Board board) {
         this.board = board;
         this.player1 = new HumanPlayer(sc);
-        this.player2 = new Opponent(board);
+        this.player2 = new AIPlayer(board);
     }
 
     public ChessGame(Player player1, Player player2) {
         this.board = new Board();
         this.player1 = player1;
-        this.player2 = new Opponent(board);
+        this.player2 = new AIPlayer(board);
     }
 
 
@@ -68,7 +69,7 @@ public class ChessGame {
     /** METHODS **/
 
     private static void humanVsGreedyAI() {
-        new ChessGame(new HumanPlayer(sc), new Opponent.GreedyAI()).startInterpreter();
+        new ChessGame(new HumanPlayer(sc), new Strategy.GreedyAI()).startInterpreter();
     }
 
     private void startInterpreter() {

@@ -61,5 +61,9 @@ public abstract class AbstractCommand {
         @Override public String toString() {
             return "BoardCommand{"+"from="+from+", to="+to+'}';
         }
+
+        public static BoardCommand empty() {
+            return new BoardCommand(BoardLoc.at(0, 0), BoardLoc.at(0, 0));
+        }
     }
 }
