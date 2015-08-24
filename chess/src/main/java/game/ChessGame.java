@@ -2,6 +2,8 @@ package game;
 
 
 import ai.Opponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Scanner;
 import java.util.Set;
@@ -19,6 +21,8 @@ public class ChessGame {
     /** MAIN **/
 
     public static void main(String[] args) {
+        final Logger logger = LoggerFactory.getLogger(ChessGame.class);
+        logger.error("STARTING! {}", logger);
         ChessGame.consoleInterpreted();
     }
 
