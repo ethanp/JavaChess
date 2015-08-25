@@ -14,7 +14,7 @@ import java.util.Stack;
 public class Board {
 
     // this looks like "bad form" with the whole "null" aspect
-    public Board() {
+    private Board() {
         this(null);
     }
 
@@ -29,8 +29,18 @@ public class Board {
         return new Board(Pieces.none());
     }
 
+    public static Board completeSet() {
+        return new Board();
+    }
+
     public boolean canUndoMove() {
         return !undoStack.isEmpty();
+    }
+
+    public boolean locHasTeam(BoardLoc from, Team team) {
+        Optional<Piece> pieceAt = getPieceAt(from);
+        return pieceAt.isPresent()
+            && pieceAt.get().team == team;
     }
 
     static class StateChange {

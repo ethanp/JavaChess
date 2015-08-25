@@ -24,6 +24,8 @@ public class AIPlayer implements Player {
 
     /**
      * in which the opponent makes his move
+     *
+     * caller is responsible for checking if the move makes sense
      */
     @Override public AbstractCommand move() {
         return chooseMove();
@@ -46,7 +48,7 @@ public class AIPlayer implements Player {
         }
 
         AIMove best = new AIMove(BoardCommand.empty(), Double.NEGATIVE_INFINITY);
-        for (Piece p : board.livePiecesFor(Team.BLACK)) {
+        for (Piece p : board.livePiecesFor(getTeam())) {
             for (BoardLoc move : p.possibleMoves()) {
                 double value = strategy.evaluate(move);
                 if (value > best.value) {

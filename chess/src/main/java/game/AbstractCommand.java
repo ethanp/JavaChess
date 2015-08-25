@@ -59,7 +59,7 @@ public abstract class AbstractCommand {
         }
 
         @Override public String toString() {
-            return "BoardCommand{"+"from="+from+", to="+to+'}';
+            return "BoardCommand{"+"from "+from+", to "+to+"}";
         }
 
         public static BoardCommand empty() {
