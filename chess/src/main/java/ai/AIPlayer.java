@@ -1,5 +1,6 @@
 package ai;
 
+import game.AbstractCommand;
 import game.AbstractCommand.BoardCommand;
 import game.Board;
 import game.BoardLoc;
@@ -13,24 +14,27 @@ public class AIPlayer implements Player {
 
     private final Board board;
     private Strategy strategy;
+    final Team team;
 
-    public AIPlayer(Board board) {
+    public AIPlayer(Team team, Board board) {
         this.board = board;
-
-        // TODO `team` should be a constructor parameter
-        Team team = Team.BLACK;
+        this.team = team;
         strategy = new Strategy.GreedyAI(board, team);
     }
 
     /**
      * in which the opponent makes his move
      */
-    @Override public void move() {
-        BoardCommand command = chooseMove();
-        board.execute(command);
+    @Override public AbstractCommand move() {
+        return chooseMove();
+    }
+
+    @Override public Team getTeam() {
+        return team;
     }
 
     private BoardCommand chooseMove() {
+
         class AIMove {
             final BoardCommand command;
             final double value;
@@ -51,11 +55,11 @@ public class AIPlayer implements Player {
                 }
             }
         }
-        if (best.command.from.equals(best.command.to))
-            throw new IllegalStateException(
-                "GAME OVER:\n"+
-                    "Stale Mate: opponent has no legal moves available");
-            return best.command;
+        if (best.value == Double.NEGATIVE_INFINITY) {
+            throw new IllegalStateException("GAME OVER:\n"+
+                "Stale Mate: opponent has no legal moves available");
+        }
+        return best.command;
     }
 
 }

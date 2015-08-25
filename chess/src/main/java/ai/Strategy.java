@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Ethan Petuchowski 8/24/15
  */
-interface Strategy {
+public interface Strategy {
     double evaluate(BoardLoc move);
 
     class GreedyAI implements Strategy {

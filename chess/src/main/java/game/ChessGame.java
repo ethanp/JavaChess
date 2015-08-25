@@ -1,10 +1,9 @@
 package game;
 
 
-import ai.HumanPlayer;
 import ai.AIPlayer;
+import ai.HumanPlayer;
 import ai.Player;
-import ai.Strategy;
 import game.AbstractCommand.BoardCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ public class ChessGame {
     public final Board board;
     private static final Scanner sc = new Scanner(System.in);
     private final Player player1;
-    private final AIPlayer player2;
+    private final Player player2;
 
 
     /** CONSTRUCTORS **/
@@ -48,14 +47,14 @@ public class ChessGame {
 
     public ChessGame(Board board) {
         this.board = board;
-        this.player1 = new HumanPlayer(sc);
-        this.player2 = new AIPlayer(board);
+        this.player1 = new HumanPlayer(Team.WHITE, sc);
+        this.player2 = new AIPlayer(Team.BLACK, board);
     }
 
-    public ChessGame(Player player1, Player player2) {
-        this.board = new Board();
+    public ChessGame(Board board, Player player1, Player player2) {
+        this.board = board;
         this.player1 = player1;
-        this.player2 = new AIPlayer(board);
+        this.player2 = player2;
     }
 
 
@@ -69,35 +68,39 @@ public class ChessGame {
     /** METHODS **/
 
     private static void humanVsGreedyAI() {
-        new ChessGame(new HumanPlayer(sc), new Strategy.GreedyAI()).startInterpreter();
+        Board board = new Board();
+        Player player1 = new HumanPlayer(Team.WHITE, sc);
+        Player player2 = new AIPlayer(Team.BLACK, board);
+        ChessGame game = new ChessGame(board, player1, player2);
+        game.startInterpreter();
+    }
+
+    private void movePlayer(Player player) {
+        AbstractCommand command = player.move();
+        if (command == AbstractCommand.UndoCommandSingleton.getInstance()) {
+            if (board.canUndoMove()) {
+                board.undoMove(); // undo player2's last move
+                board.undoMove(); // undo your own last move
+            }
+            else System.err.println("There are no moves to undo.");
+        }
+        else if (command instanceof BoardCommand) {
+            board.execute((BoardCommand) command);
+        }
+        else {
+            logger.error("invalid command {}", command);
+        }
     }
 
     private void startInterpreter() {
         while (true) {
             board.draw();
-            AbstractCommand command = promptForInput();
-            if (command == AbstractCommand.UndoCommandSingleton.getInstance()) {
-                if (board.canUndoMove()) {
-                    board.undoMove(); // undo player2's last move
-                    board.undoMove(); // undo your own last move
-                } else {
-                    System.err.println("There are no moves to undo.");
-                }
-            }
-            else if (command instanceof BoardCommand) {
-                board.execute((BoardCommand) command);
-                if (won() || stalemate(Team.BLACK)) {
-                    return;
-                }
-                board.draw();
-                player2.move();
-                if (lost() || stalemate(Team.WHITE)) {
-                    return;
-                }
-            }
-            else {
-                logger.error("invalid command {}", command);
-            }
+            movePlayer(player1);
+            if (won() || stalemate(player1.getTeam())) return;
+
+            board.draw();
+            movePlayer(player2);
+            if (won() || stalemate(player2.getTeam())) return;
         }
     }
 
