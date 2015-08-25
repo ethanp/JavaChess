@@ -39,20 +39,31 @@ public abstract class Piece {
     protected       boolean   hasMoved; // both king and rook NEED it, plus good for debugging
 
     /** SHORT UTILITIES */
-    public  String   repr()                 { return symbol+team.getRepr(); }
+
+    /**
+     * used to draw the character on the board using asci
+     */
+    public  String repr(){ return symbol+team.getRepr(); }
+
     public  BoardLoc getLoc()               { return loc; }
     public  boolean  isAlive()              { return alive; }
     public  void     kill()                 { alive = false; }
-    public  boolean  moveInvalid(BoardLoc to) { return !to.onBoard() || !possibleMoves().contains(to); }
     private void     setLoc(BoardLoc loc)   { this.loc = loc; }
     public  boolean  hasMoves()             { return !possibleMoves().isEmpty(); }
+
+    public  boolean  moveInvalid(BoardLoc to) {
+        return !to.onBoard()
+            || !possibleMoves().contains(to);
+    }
 
     /**
      * For a King, this may also be called by the King's special `isThreatened`
      * method, which is called before every turn (all the way up at
      * `startInterpreter`) to see if the game is over.
      */
-    public  void     setHasMoved()          { hasMoved = true; }
+    public void setHasMoved() {
+        hasMoved = true;
+    }
 
     boolean addLogic(int row, int col, Set<BoardLoc> locSet) {
         return addLogic(BoardLoc.at(row, col), locSet);
@@ -129,23 +140,33 @@ public abstract class Piece {
     }
 
     /**
-     * adds the location if it is either empty or the opponent's piece is occupying it
+     * Adds the location if it is either empty or the opponent's piece is occupying it
+     *
      * @return true iff the slot was empty
      *
-     * the point is that for a piece who can move up to N tiles in some direction,
+     * The point is that for a piece who can move up to N tiles in some direction,
      * will continue iterating through the tiles until addLogic == true. This way
      * it is simple to use in a for-loop, e.g. see the `straightMoves` function above.
      */
     boolean addLogic(BoardLoc loc, Set<BoardLoc> locSet) {
         if (!loc.onBoard()) return true;
-        if (loc.equals(getLoc())) return true; // crucially, don't add it to the set
-        Optional<Piece> at = board.getPieceAt(loc);
-        if (at.isPresent()) {
-            if (!at.get().team.equals(team)) {
-                locSet.add(loc);
-            }
+
+        /* don't add my loc to the move-set
+         * relied on by the King's `possibleMoves` implementation
+         */
+        if (loc.equals(getLoc())) return true;
+
+        /* If someone is currently occupying the spot, only add it as a possibleMove
+         * if that guy is on the OTHER team
+         */
+        Optional<Piece> currentOccupant = board.getPieceAt(loc);
+        if (currentOccupant.isPresent()) {
+            boolean isEnemy = !currentOccupant.get().team.equals(team);
+            if (isEnemy) locSet.add(loc);
             return false;
         }
+
+        // location is empty
         locSet.add(loc);
         return true;
     }
@@ -314,9 +335,11 @@ public abstract class Piece {
          *          surrounding and containing `this` Piece
          */
         public boolean withinOneSquareOf(BoardLoc loc) {
+            final int row = getLoc().row;
+            final int col = getLoc().col;
             for (int i = -1; i <= 1; i++)
                 for (int j = -1; j <= 1; j++)
-                    if (BoardLoc.at(getLoc().row+i, getLoc().col+j).equals(loc))
+                    if (BoardLoc.at(row+i, col+j).equals(loc))
                         return true;
             return false;
         }

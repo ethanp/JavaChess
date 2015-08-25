@@ -43,7 +43,7 @@ public class Board {
             && pieceAt.get().team == team;
     }
 
-    static class StateChange {
+    public static class StateChange {
         final Optional<Piece> killedPiece;
         final BoardCommand command;
         public StateChange(Optional<Piece> killedPiece, BoardCommand command) {

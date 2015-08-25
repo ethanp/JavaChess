@@ -43,11 +43,6 @@ public class BoardLoc {
      */
     public boolean  onBoard()      { return onBoard(row, col); }
 
-    /**
-     * @return e.g. "BoardLoc: row 3, col 5"
-     */
-    @Override public String toString() { return "BoardLoc: row "+row+", col "+col; }
-
     public static BoardLoc[] corners(int row, int col) {
         BoardLoc loc = BoardLoc.at(row, col);
         return new BoardLoc[]{
@@ -82,7 +77,8 @@ public class BoardLoc {
         // the column comes FIRST, and is A -> H
         col = standardFormCol(arr[0]);
         // the row comes second, and is 1-8 from BOTTOM -> UP
-        row = 8 -ctoi(arr[1]);
+        // so if the user said '1' they should get 7 = 8-1, or '2': 6 = 8-2
+        row = 8 - ctoi(arr[1]);
 
         return new BoardLoc(row, col);
     }
@@ -91,6 +87,21 @@ public class BoardLoc {
         if (c >= 'A' && c <= 'H') return c-'A';
         if (c >= 'a' && c <= 'h') return c-'a';
         throw new IllegalArgumentException("couldn't parse column: "+c);
+    }
+
+    @Override public String toString() {
+        return new String(new char[]{col2Std(),row2Std()});
+    }
+
+    /**
+     * for row 2, it should be 6 = 8 - 2
+     */
+    private char row2Std() {
+        return (char) ('0'+(8-row));
+    }
+
+    private char col2Std() {
+        return (char) ('A'+col);
     }
 
     /**
@@ -104,8 +115,6 @@ public class BoardLoc {
     }
 
     @Override public int hashCode() {
-        int result = row;
-        result = 31*result+col;
-        return result;
+        return 31*row+col;
     }
 }

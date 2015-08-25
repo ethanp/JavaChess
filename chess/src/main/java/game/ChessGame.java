@@ -101,11 +101,11 @@ public class ChessGame {
         }
         else logger.error("invalid command {}", command);
 
-        logger.debug("Command: "+command);
+        logger.debug("{}: {}", player.getTeam(), command);
     }
 
     private void startInterpreter() {
-        final int MOVE_LIMIT = 500;
+        final int MOVE_LIMIT = 100;
         for (int moveCounter = 0; moveCounter < MOVE_LIMIT; moveCounter++) {
             board.draw();
             movePlayer(player1);
@@ -115,6 +115,7 @@ public class ChessGame {
             movePlayer(player2);
             if (won() || stalemate(player2.getTeam())) return;
         }
+        board.draw();
         logger.warn("Game over: STALE-MATE, move limit of {} exceeded without a winner", MOVE_LIMIT);
     }
 
