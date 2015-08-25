@@ -6,7 +6,6 @@ import game.AbstractCommand.BoardCommand;
 import game.Board;
 import game.Board.StateChange;
 import game.BoardLoc;
-import game.ChessGame;
 import game.Piece;
 import game.Team;
 import org.slf4j.Logger;
@@ -111,21 +110,16 @@ public interface Strategy {
 
         // TODO FINISH_ME
         @Override public BoardCommand chooseMove() {
-            AIMove best = new AIMove(BoardCommand.empty(), Double.NEGATIVE_INFINITY);
-            for (Piece p : board.livePiecesFor(team)) {
-                AIMove move = dfsBest(p);
-                if (move.value > best.value) {
-                    best = move;
-                }
-            }
-            return best.command;
+            AIMove move = bestMoveBacktracker(team, new Stack<>(), 0);
+            return move.command;
         }
 
         private AIMove bestMoveBacktracker(Team team, Stack<StateChange> changes, int curScore) {
             if (changes.size() >= SEARCH_DEPTH) {
-
+                return new AIMove(changes.elementAt(0).command, curScore);
             }
             else {
+                AIMove bestNextLevel = new AIMove(BoardCommand.empty(), Double.NEGATIVE_INFINITY);
                 for (Piece p : board.livePiecesFor(team)) {
                     for (BoardLoc toLoc : p.possibleMoves()) {
                         BoardCommand cmd = new BoardCommand(p.getLoc(), toLoc);
@@ -133,34 +127,20 @@ public interface Strategy {
                         StateChange stateChange = new StateChange(killed, cmd);
                         changes.push(stateChange);
                         board.execute(cmd);
+                        int scoreChange = 0;
                         if (killed.isPresent()) {
                             int pieceVal = pieceEvaluator.evaluate(killed.get());
-                            curScore = team == this.team ?
-                                  curScore + pieceVal
-                                : curScore - pieceVal;
+                            scoreChange = team == this.team ? pieceVal : -pieceVal;
                         }
-                        AIMove bestThere = bestMoveBacktracker(team.other(), changes, curScore);
-                        // TODO undo the move
+                        AIMove bestThere = bestMoveBacktracker(team.other(), changes, curScore + scoreChange);
+                        if (bestNextLevel.value < bestThere.value) {
+                            bestNextLevel = bestThere;
+                        }
+                        board.undoMove();
+                        changes.pop();
                     }
                 }
             }
-        }
-
-        private AIMove dfsBest(Piece p) {
-            Stack<StateChange> stack = new Stack<>();
-            for (BoardLoc move : p.possibleMoves()) {
-                Optional<Piece> opt = board.getPieceAt(move);
-                do {
-                    for (BoardLoc toLoc : opt.get().possibleMoves()) {
-                        if (stack.size() > SEARCH_DEPTH) {
-                            BoardCommand cmd = new BoardCommand(p.getLoc(), move);
-                            stack.push(new StateChange(opt, cmd));
-                            board.execute(cmd);
-                        }
-                    }
-                } while (!stack.isEmpty());
-            }
-            return null;
         }
     }
 }

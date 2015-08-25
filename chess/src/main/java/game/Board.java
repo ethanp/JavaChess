@@ -45,7 +45,7 @@ public class Board {
 
     public static class StateChange {
         final Optional<Piece> killedPiece;
-        final BoardCommand command;
+        public final BoardCommand command;
         public StateChange(Optional<Piece> killedPiece, BoardCommand command) {
             this.killedPiece = killedPiece;
             this.command = command;
