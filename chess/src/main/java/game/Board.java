@@ -108,8 +108,9 @@ public class Board {
             boolean isLeftward = command.from.left(2).equals(command.to);
             BoardCommand leftRookFollowSuit = new BoardCommand(command.from.left(4), command.from.left());
             BoardCommand rightRookFollowSuit = new BoardCommand(command.from.right(3), command.from.right());
-            if (isLeftward) execute(leftRookFollowSuit);
-            else execute(rightRookFollowSuit);
+            // we must "force" it because jumping over the king is an "invalid" thing to do
+            if (isLeftward) forceExecute(leftRookFollowSuit);
+            else forceExecute(rightRookFollowSuit);
         }
     }
 

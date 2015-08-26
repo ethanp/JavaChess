@@ -4,7 +4,6 @@ import ai.Strategy.PieceEvaluator.TextbookEvaluator;
 import ai.Strategy.PieceEvaluator.UniformEvaluator;
 import game.AbstractCommand.BoardCommand;
 import game.Board;
-import game.Board.StateChange;
 import game.BoardLoc;
 import game.Piece;
 import game.Team;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import java.util.Stack;
 
 /**
  * Ethan Petuchowski 8/24/15
@@ -33,16 +31,16 @@ public interface Strategy {
     }
 
     interface PieceEvaluator {
-        int evaluate(Piece p);
+        int valueOf(Piece p);
 
         class UniformEvaluator implements PieceEvaluator {
-            @Override public int evaluate(Piece p) {
+            @Override public int valueOf(Piece p) {
                 return 5;
             }
         }
 
         class TextbookEvaluator implements PieceEvaluator {
-            @Override public int evaluate(Piece p) {
+            @Override public int valueOf(Piece p) {
                 // wishing Scala were here.
                 if (p instanceof Piece.Rook) return 5;
                 if (p instanceof Piece.Knight) return 3;
@@ -70,7 +68,7 @@ public interface Strategy {
         private double evaluate(BoardLoc move) {
             Optional<Piece> opt = board.getPieceAt(move);
             return !opt.isPresent() ? 0                                       // no one home
-                : opt.get().team != team ? pieceEvaluator.evaluate(opt.get()) // enemy guy in sight
+                : opt.get().team != team ? pieceEvaluator.valueOf(opt.get()) // enemy guy in sight
                 : Double.NEGATIVE_INFINITY;                                   // own team
         }
 
@@ -94,13 +92,13 @@ public interface Strategy {
         }
     }
 
-    class DepthFirstAI implements Strategy {
+    class MinimaxAI implements Strategy {
         final Board board;
         final Team team;
         static final int SEARCH_DEPTH = 2;
         PieceEvaluator pieceEvaluator = new TextbookEvaluator();
 
-        public DepthFirstAI(Board board, Team team) {
+        public MinimaxAI(Board board, Team team) {
             this.board = board;
             this.team = team;
         }
@@ -108,39 +106,76 @@ public interface Strategy {
             return team;
         }
 
-        // TODO FINISH_ME
         @Override public BoardCommand chooseMove() {
-            AIMove move = bestMoveBacktracker(team, new Stack<>(), 0);
-            return move.command;
-        }
-
-        private AIMove bestMoveBacktracker(Team team, Stack<StateChange> changes, int curScore) {
-            if (changes.size() >= SEARCH_DEPTH) {
-                return new AIMove(changes.elementAt(0).command, curScore);
-            }
-            else {
-                AIMove bestNextLevel = new AIMove(BoardCommand.empty(), Double.NEGATIVE_INFINITY);
-                for (Piece p : board.livePiecesFor(team)) {
-                    for (BoardLoc toLoc : p.possibleMoves()) {
-                        BoardCommand cmd = new BoardCommand(p.getLoc(), toLoc);
-                        Optional<Piece> killed = board.getPieceAt(toLoc);
-                        StateChange stateChange = new StateChange(killed, cmd);
-                        changes.push(stateChange);
-                        board.execute(cmd);
-                        int scoreChange = 0;
-                        if (killed.isPresent()) {
-                            int pieceVal = pieceEvaluator.evaluate(killed.get());
-                            scoreChange = team == this.team ? pieceVal : -pieceVal;
-                        }
-                        AIMove bestThere = bestMoveBacktracker(team.other(), changes, curScore + scoreChange);
-                        if (bestNextLevel.value < bestThere.value) {
-                            bestNextLevel = bestThere;
-                        }
-                        board.undoMove();
-                        changes.pop();
+            AIMove move = new AIMove(BoardCommand.empty(), Double.NEGATIVE_INFINITY);
+            for (Piece p : board.livePiecesFor(team)) {
+                for (BoardLoc toLoc : p.possibleMoves()) {
+                    double val = scoreCalc(team, 1, 0);
+                    if (val > move.value) {
+                        move = new AIMove(new BoardCommand(p.getLoc(), toLoc), val);
                     }
                 }
             }
+            return move.command;
+        }
+
+        /* TODO this is currently simple backtracking, NOT MINIMAX
+         * The difference is that this will pretend the opponent
+         * always chooses the WORST move, rather than the BEST.
+         *
+         * Assumes the first move (the one we're evaluating) has already
+         * been applied to the board, so we start at a depth of '1'.
+         *
+         * I'm thinking what it SHOULD do, is label each node of the tree with
+         * the best score that the current-level's player could get by moving
+         * there. Then we assume the player is going to pick that branch, and
+         * from there we base what the scores are for the next-level-UP.
+         *
+         * But maybe it should also be weighted so that moves nearer-to-NOW
+         * have a disproportionately large influence score-wise because they
+         * are (~exponentially) more-likely to happen.
+         */
+        private double scoreCalc(Team team, int depth, double curScore) {
+            return depth >= SEARCH_DEPTH ? curScore : bestNextLevel(team, depth, curScore);
+        }
+
+        private double bestNextLevel(Team team, int depth, double curScore) {
+            double bestNextLevel = Double.NEGATIVE_INFINITY;
+            for (Piece p : board.livePiecesFor(team)) {
+                for (BoardLoc toLoc : p.possibleMoves()) {
+                    // TODO this is basically nonsensical at the moment!
+                    bestNextLevel = needsName(team, depth, curScore, bestNextLevel, p, toLoc);
+                    double bestThere = needsName(team, depth, curScore, bestNextLevel, p, toLoc);
+                }
+            }
+            return bestNextLevel;
+        }
+
+        private double needsName(
+            Team team,
+            int depth,
+            double curScore,
+            double bestNextLevel,
+            Piece p,
+            BoardLoc toLoc)
+        {
+            Optional<Piece> killed = board.getPieceAt(toLoc);
+            board.execute(new BoardCommand(p.getLoc(), toLoc));
+            int scoreChange = getScoreChange(team, killed);
+            double bestThere = scoreCalc(team.other(), depth+1, curScore+scoreChange);
+            bestNextLevel = Math.max(bestNextLevel, bestThere);
+
+            board.undoMove();
+            return bestNextLevel;
+        }
+
+        private int getScoreChange(Team team, Optional<Piece> killed) {
+            int scoreChange = 0;
+            if (killed.isPresent()) {
+                int pieceVal = pieceEvaluator.valueOf(killed.get());
+                scoreChange = team == this.team ? pieceVal : -pieceVal;
+            }
+            return scoreChange;
         }
     }
 }

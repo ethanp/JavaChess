@@ -97,7 +97,7 @@ public class ChessGameTest {
         assertFalse(game.lost());
     }
 
-    @Test public void testEnPassant() {
+    @Test public void enPassant() {
         ChessGame testSetup = ChessGame.emptyBoard();
         Set<Piece> pieces = new HashSet<>();
         Board board = testSetup.board;
@@ -112,51 +112,19 @@ public class ChessGameTest {
         // piece should have actually been killed and therefore no longer there
         assertFalse(board.hasPieceAt("A4"));
     }
-    /* TODO : I JUST HIT THE FOLLOWING BUG
 
-        A    B    C    D    E    F    G    H
-      +---------------------------------------+
-    8 | Rw |    | Bb | Qb |    | Bb |    | Rb |
-    7 |    | Pb | Pb | Pb | Pb | Kb |    | Pb |
-    6 |    |    |    |    |    |    |    |    |
-    5 |    |    |    |    | Pw | Pb |    |    |
-    4 |    | Pw |    | Nw |    |    | Pb |    |
-    3 |    |    |    |    |    |    | Pw |    |
-    2 |    |    | Pw |    |    | Pw |    | Pw |
-    1 |    |    | Bw | Qw | Kw | Bw |    | Rw |
-      +---------------------------------------+
-    Make your move:
-    H2 H3
-
-
-        A    B    C    D    E    F    G    H
-      +---------------------------------------+
-    8 | Rw |    | Bb | Qb |    | Bb |    | Rb |
-    7 |    | Pb | Pb | Pb | Pb | Kb |    | Pb |
-    6 |    |    |    |    |    |    |    |    |
-    5 |    |    |    |    | Pw | Pb |    |    |
-    4 |    | Pw |    | Nw |    |    | Pb |    |
-    3 |    |    |    |    |    |    | Pw | Pw |
-    2 |    |    | Pw |    |    | Pw |    |    |
-    1 |    |    | Bw | Qw | Kw | Bw |    | Rw |
-      +---------------------------------------+
-    Exception in thread "main" java.util.NoSuchElementException: No value present
-        at java.util.Optional.get(Optional.java:135)
-        at main.java.of_2015.chess.game.Board.lastPieceMoved(Board.java:157)
-        at main.java.of_2015.chess.game.Piece$Pawn.canEnPassant(Piece.java:218)
-        at main.java.of_2015.chess.game.Piece$Pawn.possibleMoves(Piece.java:208)
-        at main.java.of_2015.chess.game.Piece.moveInvalid(Piece.java:46)
-        at main.java.of_2015.chess.game.Piece.move(Piece.java:67)
-        at main.java.of_2015.chess.game.Pieces.moveFromTo(Pieces.java:89)
-        at main.java.of_2015.chess.game.Board.execute(Board.java:67)
-        at main.java.of_2015.chess.ai.Opponent.move(Opponent.java:39)
-        at main.java.of_2015.chess.game.ChessGame.startInterpreter(ChessGame.java:66)
-        at main.java.of_2015.chess.game.ChessGame.consoleInterpreted(ChessGame.java:54)
-        at main.java.of_2015.chess.game.ChessGame.main(ChessGame.java:21)
-        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-        at java.lang.reflect.Method.invoke(Method.java:483)
-        at com.intellij.rt.execution.application.AppMain.main(AppMain.java:140)
-    */
+    @Test public void castleWhiteLeft() {
+        ChessGame testSetup = ChessGame.emptyBoard();
+        Set<Piece> pieces = new HashSet<>();
+        Board board = testSetup.board;
+        Piece king = new Piece.King(board, BoardLoc.parse("E1"), Team.WHITE);
+        Piece rook = new Piece.Rook(board, BoardLoc.parse("A1"), Team.WHITE);
+        pieces.addAll(Arrays.asList(king, rook));
+        testSetup.forceResetPiecesTo(pieces);
+        board.execute("E1 C1");
+        assertTrue(board.hasPieceAt("C1"));
+        assertTrue(board.hasPieceAt("D1"));
+        assertFalse(board.hasPieceAt("E1"));
+        assertFalse(board.hasPieceAt("A1"));
+    }
 }

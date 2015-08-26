@@ -181,6 +181,10 @@ public abstract class Piece {
             super(board, loc, 'R');
         }
 
+        public Rook(Board board, BoardLoc loc, Team team) {
+            super(board, loc, team, 'R');
+        }
+
         @Override public Set<BoardLoc> possibleMoves() {
             return straightMoves();
         }
@@ -273,6 +277,9 @@ public abstract class Piece {
     public static class King extends Piece {
         public King(Board board, BoardLoc loc) {
             super(board, loc, 'K');
+        }
+        public King(Board board, BoardLoc loc, Team team) {
+            super(board, loc, team, 'K');
         }
 
         @Override public Set<BoardLoc> possibleMoves() {
