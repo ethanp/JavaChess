@@ -121,10 +121,39 @@ public class ChessGameTest {
         Piece rook = new Piece.Rook(board, BoardLoc.parse("A1"), Team.WHITE);
         pieces.addAll(Arrays.asList(king, rook));
         testSetup.forceResetPiecesTo(pieces);
+
         board.execute("E1 C1");
         assertTrue(board.hasPieceAt("C1"));
         assertTrue(board.hasPieceAt("D1"));
         assertFalse(board.hasPieceAt("E1"));
         assertFalse(board.hasPieceAt("A1"));
+
+        board.undoMove();
+        assertFalse(board.hasPieceAt("C1"));
+        assertFalse(board.hasPieceAt("D1"));
+        assertTrue(board.hasPieceAt("E1"));
+        assertTrue(board.hasPieceAt("A1"));
+    }
+
+    @Test public void castleWhiteRight() {
+        ChessGame testSetup = ChessGame.emptyBoard();
+        Set<Piece> pieces = new HashSet<>();
+        Board board = testSetup.board;
+        Piece king = new Piece.King(board, BoardLoc.parse("E1"), Team.WHITE);
+        Piece rook = new Piece.Rook(board, BoardLoc.parse("H1"), Team.WHITE);
+        pieces.addAll(Arrays.asList(king, rook));
+        testSetup.forceResetPiecesTo(pieces);
+
+        board.execute("E1 G1");
+        assertTrue(board.hasPieceAt("G1"));
+        assertTrue(board.hasPieceAt("F1"));
+        assertFalse(board.hasPieceAt("E1"));
+        assertFalse(board.hasPieceAt("H1"));
+
+        board.undoMove();
+        assertFalse(board.hasPieceAt("G1"));
+        assertFalse(board.hasPieceAt("F1"));
+        assertTrue(board.hasPieceAt("E1"));
+        assertTrue(board.hasPieceAt("H1"));
     }
 }

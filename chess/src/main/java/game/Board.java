@@ -63,12 +63,15 @@ public class Board {
      * doesn't check whether the move is valid.
      * for example we have to move pawns backwards.
      */
-    public void forceExecute(BoardCommand command) {
+    public void forceExecute(BoardCommand command, boolean addToStack) {
         Optional<Piece> movedPiece = getPieceAt(command.from);
         if (!movedPiece.isPresent()) {
-            throw new IllegalStateException("Can't undo, no one home at "+command.from);
+            // TODO replace with a logger.error(more of the relevant info)
+            throw new IllegalStateException("Can't execute, no one home at "+command.from);
         }
+        Optional<Piece> killed = getPieceAt(command.to);
         pieces.forceMove(command.from, command.to);
+        if (addToStack) undoStack.add(new StateChange(killed, command));
     }
 
     /**
@@ -109,8 +112,8 @@ public class Board {
             BoardCommand leftRookFollowSuit = new BoardCommand(command.from.left(4), command.from.left());
             BoardCommand rightRookFollowSuit = new BoardCommand(command.from.right(3), command.from.right());
             // we must "force" it because jumping over the king is an "invalid" thing to do
-            if (isLeftward) forceExecute(leftRookFollowSuit);
-            else forceExecute(rightRookFollowSuit);
+            if (isLeftward) forceExecute(leftRookFollowSuit, true);
+            else forceExecute(rightRookFollowSuit, true);
         }
     }
 
@@ -134,7 +137,7 @@ public class Board {
     public void undoMove() {
         if (!canUndoMove()) return; // TODO is this how I want to handle this IllegalState?
         StateChange lastChange = undoStack.pop();
-        forceExecute(lastChange.command.opposite());
+        forceExecute(lastChange.command.opposite(), false);
 
         /* Restore the piece that was killed as a result of this move
          *
