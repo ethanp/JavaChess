@@ -1,7 +1,7 @@
 package ai.strategies;
 
-import game.BoardCommand;
 import game.Board;
+import game.BoardCommand;
 import game.Piece;
 import game.Team;
 import org.slf4j.Logger;
@@ -48,6 +48,7 @@ public interface Strategy {
                 if (p instanceof Piece.King) return 100;
                 if (p instanceof Piece.Queen) return 9;
                 if (p instanceof Piece.Pawn) return 1;
+                if (p instanceof Piece.ZERO_VALUE) return 0;
                 STRATEGY_LOGGER.error("can't evaluate piece {}", p);
                 return -1;
             }
@@ -61,30 +62,35 @@ public interface Strategy {
     abstract class BoardEvaluator {
         final Team team;
 
-        protected BoardEvaluator(Team team) {this.team = team;}
+        protected BoardEvaluator(Team team, PieceEvaluator evaluator) {
+            this.team = team;
+            this.pieceEvaluator = evaluator;
+        }
+
+        final PieceEvaluator pieceEvaluator;
+
+        BoardEvaluator(Team team) {
+            this(team, new PieceEvaluator.TextbookEvaluator());
+        }
 
         abstract double evaluate(Board board);
 
+        public double evaluatePiece(Piece piece) {
+            return pieceEvaluator.valueOf(piece);
+        }
+
         static class EvaluateByPieces extends BoardEvaluator {
-            final PieceEvaluator pieceEvaluator;
 
-            EvaluateByPieces(Team team) {
-                this(team, new PieceEvaluator.TextbookEvaluator());
-            }
-
-            EvaluateByPieces(Team team, PieceEvaluator evaluator) {
-                super(team);
-                EvaluateByPieces.this.pieceEvaluator = evaluator;
-            }
+            EvaluateByPieces(Team team) { super(team); }
 
             @Override public double evaluate(Board board) {
                 double sum = 0;
                 for (Piece p : board.getLivePieces()) {
                     if (p.team == team) {
-                        sum += EvaluateByPieces.this.pieceEvaluator.valueOf(p);
+                        sum += evaluatePiece(p);
                     }
                     else {
-                        sum -= EvaluateByPieces.this.pieceEvaluator.valueOf(p);
+                        sum -= evaluatePiece(p);
                     }
                 }
                 return sum;

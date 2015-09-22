@@ -2,6 +2,7 @@ package ai.strategies;
 
 import game.Board;
 import game.BoardCommand;
+import game.Piece;
 import game.Team;
 
 /**
@@ -49,8 +50,8 @@ public class MinimaxAI implements Strategy {
      * find the minimax score of executing the command
      */
     double minimax(BoardCommand command) {
-        board.execute(command);
-        double score = minimax(0, true);
+        Piece killed = board.execute(command).orElse(Piece.ZERO_VALUE.instance());
+        double score = minimax(0, false) + boardEvaluator.evaluatePiece(killed);
         board.undoMove();
         return score;
     }

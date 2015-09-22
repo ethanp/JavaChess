@@ -363,4 +363,11 @@ public abstract class Piece {
             return moves;
         }
     }
+
+    public static class ZERO_VALUE extends Piece {
+        private ZERO_VALUE() { super(null, null, '0'); }
+        @Override public Set<BoardLoc> possibleMoves() { return null; }
+        static ZERO_VALUE instance = new ZERO_VALUE();
+        public static ZERO_VALUE instance() { return instance; }
+    }
 }
