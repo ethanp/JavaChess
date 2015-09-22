@@ -1,7 +1,9 @@
 package ai.strategies;
 
-import game.AbstractCommand.BoardCommand;
+import game.BoardCommand;
+import game.Board;
 import game.Piece;
+import game.Team;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,4 +55,40 @@ public interface Strategy {
     }
 
 
+    /**
+     * Ethan Petuchowski 9/22/15
+     */
+    abstract class BoardEvaluator {
+        final Team team;
+
+        protected BoardEvaluator(Team team) {this.team = team;}
+
+        abstract double evaluate(Board board);
+
+        static class EvaluateByPieces extends BoardEvaluator {
+            final PieceEvaluator pieceEvaluator;
+
+            EvaluateByPieces(Team team) {
+                this(team, new PieceEvaluator.TextbookEvaluator());
+            }
+
+            EvaluateByPieces(Team team, PieceEvaluator evaluator) {
+                super(team);
+                EvaluateByPieces.this.pieceEvaluator = evaluator;
+            }
+
+            @Override public double evaluate(Board board) {
+                double sum = 0;
+                for (Piece p : board.getLivePieces()) {
+                    if (p.team == team) {
+                        sum += EvaluateByPieces.this.pieceEvaluator.valueOf(p);
+                    }
+                    else {
+                        sum -= EvaluateByPieces.this.pieceEvaluator.valueOf(p);
+                    }
+                }
+                return sum;
+            }
+        }
+    }
 }

@@ -1,4 +1,4 @@
-import game.AbstractCommand.BoardCommand;
+import game.BoardCommand;
 import game.Board;
 import game.BoardLoc;
 import game.ChessGame;

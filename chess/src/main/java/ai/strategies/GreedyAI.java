@@ -2,7 +2,7 @@ package ai.strategies;
 
 import ai.AIPlayer;
 import ai.Player;
-import game.AbstractCommand;
+import game.BoardCommand;
 import game.BoardLoc;
 import game.Piece;
 
@@ -15,7 +15,8 @@ public class GreedyAI implements Strategy {
     PieceEvaluator pieceEvaluator;
     final AIPlayer aiPlayer;
 
-    @Override public Player getPlayer() {
+    // TODO delete?
+    public Player getPlayer() {
         return aiPlayer;
     }
 
@@ -25,20 +26,20 @@ public class GreedyAI implements Strategy {
     }
 
     private double evaluate(BoardLoc move) {
-        Optional<Piece> opt = board.getPieceAt(move);
+        Optional<Piece> opt = aiPlayer.getBoard().getPieceAt(move);
         return !opt.isPresent() ? 0                                       // no one home
-            : opt.get().team != team ? pieceEvaluator.valueOf(opt.get()) // enemy guy in sight
+            : opt.get().team != aiPlayer.getTeam() ? pieceEvaluator.valueOf(opt.get()) // enemy guy in sight
             : Double.NEGATIVE_INFINITY;                                   // own team
     }
 
-    @Override public AbstractCommand.BoardCommand chooseMove() {
+    @Override public BoardCommand chooseMove() {
 
-        AIMove best = new AIMove(AbstractCommand.BoardCommand.empty(), Double.NEGATIVE_INFINITY);
-        for (Piece p : board.livePiecesFor(team)) {
+        AIMove best = new AIMove(BoardCommand.empty(), Double.NEGATIVE_INFINITY);
+        for (Piece p : aiPlayer.getBoard().livePiecesFor(aiPlayer.getTeam())) {
             for (BoardLoc move : p.possibleMoves()) {
                 double value = evaluate(move);
                 if (value > best.value) {
-                    AbstractCommand.BoardCommand command = new AbstractCommand.BoardCommand(p.getLoc(), move);
+                    BoardCommand command = new BoardCommand(p.getLoc(), move);
                     best = new AIMove(command, value);
                 }
             }

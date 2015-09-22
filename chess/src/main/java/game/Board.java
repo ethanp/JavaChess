@@ -1,9 +1,10 @@
 package game;
 
-import game.AbstractCommand.BoardCommand;
 import game.CommandLineRenderer.CoordinateCommandLineRenderer;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
@@ -72,6 +73,17 @@ public class Board {
         Optional<Piece> killed = getPieceAt(command.to);
         pieces.forceMove(command.from, command.to);
         if (addToStack) undoStack.add(new StateChange(killed, command));
+    }
+
+    /**
+     * Get a list of the moves for a given team
+     */
+    public List<BoardCommand> getMovesFor(Team team) {
+        List<BoardCommand> moves = new ArrayList<>();
+        for (Piece p : livePiecesFor(team))
+            for (BoardLoc toLoc : p.possibleMoves())
+                moves.add(new BoardCommand(p.getLoc(), toLoc));
+        return moves;
     }
 
     /**

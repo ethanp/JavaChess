@@ -4,7 +4,6 @@ package game;
 import ai.AIPlayer;
 import ai.HumanPlayer;
 import ai.Player;
-import game.AbstractCommand.BoardCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,99 +1,80 @@
 package ai.strategies;
 
-import game.AbstractCommand;
 import game.Board;
-import game.BoardLoc;
-import game.Piece;
+import game.BoardCommand;
 import game.Team;
-
-import java.util.Optional;
 
 /**
  * Ethan Petuchowski 8/30/15
+ *
+ * An AI Strategy that chooses moves based on running
  */
 public class MinimaxAI implements Strategy {
     final Board board;
     final Team team;
     static final int SEARCH_DEPTH = 2;
-    PieceEvaluator pieceEvaluator = new PieceEvaluator.TextbookEvaluator();
+    BoardEvaluator boardEvaluator;
 
     public MinimaxAI(Board board, Team team) {
         this.board = board;
         this.team = team;
+        boardEvaluator = new BoardEvaluator.EvaluateByPieces(team);
     }
 
     public Team getTeam() {
         return team;
     }
 
-    @Override public AbstractCommand.BoardCommand chooseMove() {
-        AIMove move = new AIMove(AbstractCommand.BoardCommand.empty(), Double.NEGATIVE_INFINITY);
-        for (Piece p : board.livePiecesFor(team)) {
-            for (BoardLoc toLoc : p.possibleMoves()) {
-                double val = scoreCalc(team, 1, 0);
-                if (val > move.value) {
-                    move = new AIMove(new AbstractCommand.BoardCommand(p.getLoc(), toLoc), val);
-                }
-            }
-        }
-        return move.command;
-    }
-
-    /* TODO this is currently simple backtracking, NOT MINIMAX
-     * The difference is that this will pretend the opponent
-     * always chooses the WORST move, rather than the BEST.
+    /**
+     * Choose the move that scores highest according to minimax
      *
-     * Assumes the first move (the one we're evaluating) has already
-     * been applied to the board, so we start at a depth of '1'.
-     *
-     * I'm thinking what it SHOULD do, is label each node of the tree with
-     * the best score that the current-level's player could get by moving
-     * there. Then we assume the player is going to pick that branch, and
-     * from there we base what the scores are for the next-level-UP.
-     *
-     * But maybe it should also be weighted so that moves nearer-to-NOW
-     * have a disproportionately large influence score-wise because they
-     * are (~exponentially) more-likely to happen.
+     * ```scala
+     * moves.groupBy(minimax).maxBy(_._1)._2.head
+     * ```
      */
-    private double scoreCalc(Team team, int depth, double curScore) {
-        return depth >= SEARCH_DEPTH ? curScore : bestNextLevel(team, depth, curScore);
-    }
-
-    private double bestNextLevel(Team team, int depth, double curScore) {
-        double bestNextLevel = Double.NEGATIVE_INFINITY;
-        for (Piece p : board.livePiecesFor(team)) {
-            for (BoardLoc toLoc : p.possibleMoves()) {
-                // TODO this is basically nonsensical at the moment!
-                bestNextLevel = needsName(team, depth, curScore, bestNextLevel, p, toLoc);
-                double bestThere = needsName(team, depth, curScore, bestNextLevel, p, toLoc);
+    @Override public BoardCommand chooseMove() {
+        BoardCommand bestMove = null;
+        double bestVal = Double.NEGATIVE_INFINITY;
+        for(BoardCommand curMove : board.getMovesFor(team)) {
+            double curVal = minimax(curMove);
+            if (curVal > bestVal) {
+                bestMove = curMove;
+                bestVal = curVal;
             }
         }
-        return bestNextLevel;
+        return bestMove;
     }
 
-    private double needsName(
-        Team team,
-        int depth,
-        double curScore,
-        double bestNextLevel,
-        Piece p,
-        BoardLoc toLoc) {
-        Optional<Piece> killed = board.getPieceAt(toLoc);
-        board.execute(new AbstractCommand.BoardCommand(p.getLoc(), toLoc));
-        int scoreChange = getScoreChange(team, killed);
-        double bestThere = scoreCalc(team.other(), depth+1, curScore+scoreChange);
-        bestNextLevel = Math.max(bestNextLevel, bestThere);
-
+    /**
+     * find the minimax score of executing the command
+     */
+    double minimax(BoardCommand command) {
+        board.execute(command);
+        double score = minimax(0, true);
         board.undoMove();
-        return bestNextLevel;
+        return score;
     }
 
-    private int getScoreChange(Team team, Optional<Piece> killed) {
-        int scoreChange = 0;
-        if (killed.isPresent()) {
-            int pieceVal = pieceEvaluator.valueOf(killed.get());
-            scoreChange = team == this.team ? pieceVal : -pieceVal;
+    /**
+     * run the minimax algorithm on the current state of the board
+     */
+    private double minimax(int curDepth, boolean maximize) {
+        if (curDepth == SEARCH_DEPTH) {
+            return boardEvaluator.evaluate(board);
+        } else {
+            double bestScore = 0;
+            for (BoardCommand move : board.getMovesFor(team)) {
+                board.execute(move);
+                double score = minimax(curDepth+1, !maximize);
+                if (score > bestScore && maximize) {
+                    bestScore = score;
+                }
+                else if (score < bestScore && !maximize) {
+                    bestScore = score;
+                }
+                board.undoMove();
+            }
+            return bestScore;
         }
-        return scoreChange;
     }
 }
