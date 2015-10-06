@@ -85,14 +85,8 @@ public interface Strategy {
 
             @Override public double evaluate(Board board) {
                 double sum = 0;
-                for (Piece p : board.getLivePieces()) {
-                    if (p.team == team) {
-                        sum += evaluatePiece(p);
-                    }
-                    else {
-                        sum -= evaluatePiece(p);
-                    }
-                }
+                for (Piece p : board.getLivePieces())
+                    sum += p.team == team ? evaluatePiece(p) : -evaluatePiece(p);
                 return sum;
             }
         }
