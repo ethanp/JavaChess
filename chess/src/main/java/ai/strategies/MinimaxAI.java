@@ -67,10 +67,9 @@ public class MinimaxAI implements Strategy {
             for (BoardCommand move : board.getMovesFor(team)) {
                 board.execute(move);
                 double score = minimax(curDepth+1, !maximize);
-                if (score > bestScore && maximize) {
-                    bestScore = score;
-                }
-                else if (score < bestScore && !maximize) {
+                if ((score > bestScore &&  maximize)
+                 || (score < bestScore && !maximize))
+                {
                     bestScore = score;
                 }
                 board.undoMove();
