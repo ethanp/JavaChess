@@ -2,9 +2,9 @@ package player;
 
 import player.strategies.GreedyAI;
 import player.strategies.Strategy;
-import game.AbstractCommand;
+import game.cmd.AbstractCommand;
 import game.Board;
-import game.BoardCommand;
+import game.cmd.BoardCommand;
 import game.Team;
 
 /**

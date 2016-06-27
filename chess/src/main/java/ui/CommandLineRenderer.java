@@ -1,4 +1,9 @@
-package game;
+package ui;
+
+import game.Board;
+import game.BoardLoc;
+import game.Piece;
+import game.Team;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +18,7 @@ public class CommandLineRenderer implements BoardRenderer {
         this.board = board;
     }
 
-    static Set<Piece> parseBoard(String rawBoardString, Board board) {
+    public static Set<Piece> parseBoard(String rawBoardString, Board board) {
         Set<Piece> toRet = new HashSet<>();
         String[] lines = rawBoardString.split("\n");
         for (int i = 2; i < lines.length - 1; i++) {
@@ -24,10 +29,10 @@ public class CommandLineRenderer implements BoardRenderer {
             for (int col = 0; col < BOARD_WIDTH; col++) {
                 final char ch = startFromFirstPiece.charAt(col*PIECE_WIDTH);
                 if (ch != ' ') {
-                    char teamChar = startFromFirstPiece.charAt(col*PIECE_WIDTH+1);
+                    char teamChar = startFromFirstPiece.charAt(col*PIECE_WIDTH + 1);
                     Team team = teamChar == 'b' ? Team.BLACK : Team.WHITE;
                     BoardLoc loc = BoardLoc.at(row, col);
-                    if (ch == 'R') toRet.add(new Piece.Rook(board, loc, team));
+                    if (ch == 'R') /**/ toRet.add(new Piece.Rook(board, loc, team));
                     else if (ch == 'P') toRet.add(new Piece.Pawn(board, loc, team));
                     else if (ch == 'B') toRet.add(new Piece.Bishop(board, loc, team));
                     else if (ch == 'N') toRet.add(new Piece.Knight(board, loc, team));

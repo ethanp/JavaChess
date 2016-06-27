@@ -1,7 +1,7 @@
 package player.strategies;
 
 import game.Board;
-import game.BoardCommand;
+import game.cmd.BoardCommand;
 import game.Piece;
 import game.Team;
 import org.slf4j.Logger;

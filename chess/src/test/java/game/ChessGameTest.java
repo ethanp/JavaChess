@@ -1,11 +1,6 @@
 package game;
 
-import game.Board;
-import game.BoardCommand;
-import game.BoardLoc;
-import game.ChessGame;
-import game.Piece;
-import game.Team;
+import game.cmd.BoardCommand;
 import org.junit.Before;
 import org.junit.Test;
 

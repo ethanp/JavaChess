@@ -1,6 +1,8 @@
 package game;
 
 
+import game.cmd.AbstractCommand;
+import game.cmd.BoardCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import player.AIPlayer;

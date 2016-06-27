@@ -1,7 +1,7 @@
 package player.strategies;
 
 import game.Board;
-import game.BoardCommand;
+import game.cmd.BoardCommand;
 import game.Piece;
 import game.Team;
 
@@ -11,10 +11,10 @@ import game.Team;
  * An AI Strategy that chooses moves based on running
  */
 public class MinimaxAI implements Strategy {
-    static final int SEARCH_DEPTH = 2;
-    final Board board;
-    final Team team;
-    BoardEvaluator boardEvaluator;
+    private static final int SEARCH_DEPTH = 2;
+    private final Board board;
+    private final Team team;
+    private BoardEvaluator boardEvaluator;
 
     public MinimaxAI(Board board, Team team) {
         this.board = board;
@@ -47,7 +47,7 @@ public class MinimaxAI implements Strategy {
     /**
      * find the minimax score of executing the command
      */
-    double minimax(BoardCommand command) {
+    private double minimax(BoardCommand command) {
         Piece killed = board.execute(command).orElse(Piece.ZERO_VALUE.instance());
         double score = minimax(0, false) + boardEvaluator.evaluatePiece(killed);
         board.undoMove();

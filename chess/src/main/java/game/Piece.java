@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 /**
  * Ethan Petuchowski 7/7/15
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class Piece {
 
     public final Team team;
@@ -127,12 +128,13 @@ public abstract class Piece {
      * used while undoing a move
      * @param to the location the moved piece will end up
      */
-    public void forceMove(BoardLoc to) {
+    void forceMove(BoardLoc to) {
         if (!to.onBoard()) { // don't check if this move is valid for this piece
             throw new IllegalStateException(to + " is not on the board.");
         }
         alive = true;
         // TODO how am I going to UNSET `hasMoved`?
+        // maybe capture it in the move state?
         setLoc(to);
     }
 
@@ -145,8 +147,7 @@ public abstract class Piece {
     }
 
     /* used by queen and rook */
-    @SuppressWarnings("StatementWithEmptyBody")
-    Set<BoardLoc> straightMoves() {
+    @SuppressWarnings("StatementWithEmptyBody") Set<BoardLoc> straightMoves() {
         Set<BoardLoc> locSet = new HashSet<>();
         for (int r = getLoc().row - 1; r >= 0 && addLogic(r, getLoc().col, locSet); r--) ;
         for (int r = getLoc().row + 1; r < 8 && addLogic(r, getLoc().col, locSet); r++) ;
@@ -199,7 +200,7 @@ public abstract class Piece {
      * iterating through the tiles until addLogic == true. This way it is simple to use in a
      * for-loop, e.g. see the `straightMoves` function above.
      */
-    boolean addLogic(BoardLoc loc, Set<BoardLoc> locSet) {
+    public boolean addLogic(BoardLoc loc, Set<BoardLoc> locSet) {
         if (!loc.onBoard()) return true;
 
         /* don't add my loc to the move-set
@@ -222,7 +223,7 @@ public abstract class Piece {
         return true;
     }
 
-    boolean hasEnemyPiece(BoardLoc loc) {
+    public boolean hasEnemyPiece(BoardLoc loc) {
         Optional<Piece> at = board.getPieceAt(loc);
         return at.isPresent() && !at.get().team.equals(team);
     }
@@ -342,6 +343,7 @@ public abstract class Piece {
             super(board, loc, team, 'K');
         }
 
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private static boolean castleValid(boolean sideIsEmpty, Optional<Piece> rookOpt) {
             return sideIsEmpty
                 && rookOpt.isPresent()

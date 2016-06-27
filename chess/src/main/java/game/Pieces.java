@@ -1,5 +1,7 @@
 package game;
 
+import ui.CommandLineRenderer;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;

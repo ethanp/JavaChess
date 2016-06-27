@@ -1,12 +1,11 @@
 package player.strategies;
 
-import game.AbstractCommand;
+import game.cmd.AbstractCommand;
 import game.Board;
-import game.BoardCommand;
+import game.cmd.BoardCommand;
 import game.BoardLoc;
 import game.ChessGame;
 import game.Team;
-import org.junit.Before;
 import org.junit.Test;
 import player.AIPlayer;
 import player.HumanPlayer;
@@ -20,16 +19,10 @@ import static org.junit.Assert.assertThat;
  * Ethan Petuchowski 6/26/16
  */
 public class GreedyTextbookAITest {
-    private ChessGame game;
-
-    @Before public void setup() {
-        game = new ChessGame();
-    }
 
     /**
      * it is black's turn, and a textbook greedy AI will win right away
-     */
-     /*
+     *//*
      * This is the sequence of movies against the greedy AI that brought
      * me to this place: (though that was against the [now defunct] uniform AI)
      *
@@ -42,7 +35,7 @@ public class GreedyTextbookAITest {
      * a2 a4 || c2 a1
      *
      */
-    @Test public void nextMoveShouldMate() {
+    @Test public void eatKingIfPossible() {
         String boardConfig = "" + // <-- for auto-formatter
             "    A    B    C    D    E    F    G    H   \n" +
             "  +---------------------------------------+\n" +
@@ -66,5 +59,4 @@ public class GreedyTextbookAITest {
         assertEquals(BoardLoc.parse("c2"), bc.from);
         assertEquals(BoardLoc.parse("e1"), bc.to);
     }
-
 }

@@ -1,4 +1,6 @@
-package game;
+package game.cmd;
+
+import game.BoardLoc;
 
 /**
  * Ethan Petuchowski 8/21/15

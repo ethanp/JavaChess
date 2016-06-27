@@ -1,6 +1,7 @@
 package game;
 
 import org.junit.Test;
+import ui.CommandLineRenderer;
 
 import java.util.HashSet;
 import java.util.Set;

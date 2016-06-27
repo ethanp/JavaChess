@@ -1,6 +1,6 @@
 package player;
 
-import game.AbstractCommand;
+import game.cmd.AbstractCommand;
 import game.Team;
 
 import java.util.Scanner;

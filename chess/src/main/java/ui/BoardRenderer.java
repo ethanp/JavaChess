@@ -1,4 +1,4 @@
-package game;
+package ui;
 
 /**
  * Ethan Petuchowski 7/26/15

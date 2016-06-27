@@ -1,5 +1,10 @@
 package game;
 
+import game.cmd.AbstractCommand;
+import game.cmd.BoardCommand;
+import ui.BoardRenderer;
+import ui.CommandLineRenderer;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,15 +22,11 @@ public class Board {
     private final Stack<StateChange> undoStack = new Stack<>();
     private BoardRenderer boardRenderer = new CommandLineRenderer(this);
 
-    // this looks like "bad form" with the whole "null" aspect
     Board() {
         this.pieces = Pieces.completeSet(this);
     }
 
     private Board(Pieces pieces) {
-        if (pieces == null) throw new NullPointerException(
-            "pieces was null; use the no-arg constructor instead"
-        );
         this.pieces = pieces;
     }
 

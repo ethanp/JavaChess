@@ -1,4 +1,6 @@
-package game;
+package game.cmd;
+
+import game.BoardLoc;
 
 /**
  * Ethan Petuchowski 9/22/15
@@ -14,16 +16,16 @@ public class BoardCommand extends AbstractCommand {
         this.to = to;
     }
 
-    public static game.BoardCommand empty() {
-        return new game.BoardCommand(BoardLoc.at(0, 0), BoardLoc.at(0, 0));
+    public static BoardCommand empty() {
+        return new BoardCommand(BoardLoc.at(0, 0), BoardLoc.at(0, 0));
     }
 
     /**
      * Note: calling this will not in itself restore any pieces that were eaten by the original
      * move
      */
-    public game.BoardCommand opposite() {
-        return new game.BoardCommand(to, from);
+    public BoardCommand opposite() {
+        return new BoardCommand(to, from);
     }
 
     public int distance() {
