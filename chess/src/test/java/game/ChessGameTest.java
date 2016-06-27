@@ -1,3 +1,5 @@
+package game;
+
 import game.Board;
 import game.BoardCommand;
 import game.BoardLoc;

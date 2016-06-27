@@ -1,7 +1,7 @@
 package game;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Ethan Petuchowski 7/26/15
@@ -13,8 +13,8 @@ public class CommandLineRenderer implements BoardRenderer {
         this.board = board;
     }
 
-    static Iterable<? extends Piece> parseBoard(String rawBoardString, Board board) {
-        List<Piece> toRet = new ArrayList<>();
+    static Set<Piece> parseBoard(String rawBoardString, Board board) {
+        Set<Piece> toRet = new HashSet<>();
         String[] lines = rawBoardString.split("\n");
         for (int i = 2; i < lines.length - 1; i++) {
             final int row = i - 2;

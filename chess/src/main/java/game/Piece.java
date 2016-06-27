@@ -28,6 +28,28 @@ public abstract class Piece {
         this(board, loc, loc.getTerritory(), symbol);
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Piece piece = (Piece) o;
+
+        if (symbol != piece.symbol) return false;
+        if (hasMoved != piece.hasMoved) return false;
+        if (alive != piece.alive) return false;
+        if (team != piece.team) return false;
+        return loc.equals(piece.loc);
+    }
+
+    @Override public int hashCode() {
+        int result = team.hashCode();
+        result = 31*result + (int) symbol;
+        result = 31*result + (hasMoved ? 1 : 0);
+        result = 31*result + loc.hashCode();
+        result = 31*result + (alive ? 1 : 0);
+        return result;
+    }
+
     /**
      * must be implemented by each type of chess piece
      * @return set of legal locations for this piece to move to on this turn, given which team its

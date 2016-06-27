@@ -139,7 +139,8 @@ public class BoardLoc {
         if (this == o) return true;
         if (!(o instanceof BoardLoc)) return false;
         BoardLoc loc = (BoardLoc) o;
-        return row == loc.row && col == loc.col;
+        return row == loc.row
+            && col == loc.col;
     }
 
     @Override public int hashCode() {

@@ -18,7 +18,7 @@ public class Board {
     private BoardRenderer boardRenderer = new CommandLineRenderer(this);
 
     // this looks like "bad form" with the whole "null" aspect
-    private Board() {
+    Board() {
         this.pieces = Pieces.completeSet(this);
     }
 
