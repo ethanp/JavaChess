@@ -17,6 +17,7 @@ public abstract class Piece {
     protected boolean hasMoved; // both king and rook NEED it, plus good for debugging
     private BoardLoc loc;
     private boolean alive;
+
     private Piece(Board board, BoardLoc loc, Team team, char symbol) {
         this.loc = loc;
         this.team = team;
@@ -24,10 +25,15 @@ public abstract class Piece {
         this.alive = true;
         this.symbol = symbol;
     }
+
     public Piece(Board board, BoardLoc loc, char symbol) {
         this(board, loc, loc.getTerritory(), symbol);
     }
 
+    /**
+     * NB: equals/hashcode do not depend on board-id-equality. I.e. each piece may come from a
+     * different board, and they can still be equal.
+     */
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

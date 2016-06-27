@@ -23,7 +23,7 @@ public class ChessGame {
 
 
     private static final Logger logger = LoggerFactory.getLogger(ChessGame.class);
-    private static final Scanner STDIN_scanner = new Scanner(System.in);
+    public static final Scanner STDIN_scanner = new Scanner(System.in);
 
     /** FIELDS **/
 
@@ -41,7 +41,7 @@ public class ChessGame {
     public ChessGame(Board board) {
         this.board = board;
         this.player1 = new HumanPlayer(Team.WHITE, STDIN_scanner);
-        this.player2 = AIPlayer.newGreedyUniformAI(Team.BLACK, board);
+        this.player2 = AIPlayer.newGreedyTextbookAI(Team.BLACK, board);
     }
 
     public ChessGame(Board board, Player player1, Player player2) {
@@ -70,24 +70,17 @@ public class ChessGame {
         System.out.println("Type 'exit' to quit the game.");
         Board board = Board.completeSet();
         Player player1 = new HumanPlayer(Team.WHITE, STDIN_scanner);
-        Player player2 = AIPlayer.newGreedyUniformAI(Team.BLACK, board);
+        Player player2 = AIPlayer.newGreedyTextbookAI(Team.BLACK, board);
         ChessGame game = new ChessGame(board, player1, player2);
         game.startInterpreter();
     }
 
     static void greedyAI_v_greedyAI() {
         Board board = Board.completeSet();
-        Player player1 = AIPlayer.newGreedyUniformAI(Team.WHITE, board);
-        Player player2 = AIPlayer.newGreedyUniformAI(Team.BLACK, board);
+        Player player1 = AIPlayer.newGreedyTextbookAI(Team.WHITE, board);
+        Player player2 = AIPlayer.newGreedyTextbookAI(Team.BLACK, board);
         ChessGame game = new ChessGame(board, player1, player2);
         game.startInterpreter();
-    }
-
-    public static ChessGame fromPrintout(String rawLayoutString, Team firstMove) {
-        Board board = Board.fromPrintout(rawLayoutString);
-        Player player1 = AIPlayer.newGreedyUniformAI(Team.WHITE, board);
-        Player player2 = AIPlayer.newGreedyUniformAI(Team.BLACK, board);
-        return new ChessGame(board, player1, player2);
     }
 
     private void movePlayer(Player player) {

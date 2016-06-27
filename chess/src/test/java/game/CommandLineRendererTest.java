@@ -25,7 +25,7 @@ public class CommandLineRendererTest {
             "1 |    |    |    |    |    |    |    | Rw |\n" +
             "  +---------------------------------------+";
         Board board = new Board();
-        Set<Piece> c = CommandLineRenderer.parseBoard(boardConfig, board);
+        Set<Piece> parsedPieceSet = CommandLineRenderer.parseBoard(boardConfig, board);
         Board idealBoard = new Board();
         Set<Piece> idealPieces = new HashSet<>();
         idealPieces.add(new Piece.Rook(idealBoard, BoardLoc.at(0, 0), Team.BLACK));
@@ -38,8 +38,8 @@ public class CommandLineRendererTest {
         idealPieces.add(new Piece.Rook(idealBoard, BoardLoc.at(0, 7), Team.BLACK));
         idealPieces.add(new Piece.Pawn(idealBoard, BoardLoc.at(6, 7), Team.WHITE));
         idealPieces.add(new Piece.Rook(idealBoard, BoardLoc.at(7, 7), Team.WHITE));
-        for (Piece p : c) {
-            assertTrue(idealPieces.contains(p));
+        for (Piece parsedPiece : parsedPieceSet) {
+            assertTrue(idealPieces.contains(parsedPiece));
         }
     }
 }

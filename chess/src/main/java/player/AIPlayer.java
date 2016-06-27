@@ -22,8 +22,8 @@ public class AIPlayer implements Player {
         this.strategy = strategy;
     }
 
-    public static AIPlayer newGreedyUniformAI(Team team, Board board) {
-        GreedyAI evaluator = new GreedyAI(team, board, Strategy.PieceEvaluator.uniform());
+    public static AIPlayer newGreedyTextbookAI(Team team, Board board) {
+        GreedyAI evaluator = new GreedyAI(team, board, Strategy.PieceEvaluator.textbook());
         return new AIPlayer(team, board, evaluator);
     }
 

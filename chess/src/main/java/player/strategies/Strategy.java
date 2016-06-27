@@ -16,16 +16,12 @@ public interface Strategy {
     BoardCommand chooseMove();
 
     interface PieceEvaluator {
-        static UniformEvaluator uniform() {
-            return new UniformEvaluator();
-        }
-        int valueOf(Piece p);
 
-        class UniformEvaluator implements PieceEvaluator {
-            @Override public int valueOf(Piece p) {
-                return 5;
-            }
+        static TextbookEvaluator textbook() {
+            return new TextbookEvaluator();
         }
+
+        int valueOf(Piece p);
 
         class TextbookEvaluator implements PieceEvaluator {
             @Override public int valueOf(Piece p) {
