@@ -275,6 +275,10 @@ public abstract class Piece {
             super(board, loc, 'N');
         }
 
+        public Knight(Board board, BoardLoc loc, Team team) {
+            super(board, loc, team, 'N');
+        }
+
         @Override public Set<BoardLoc> possibleMoves() {
             Set<BoardLoc> locSet = new HashSet<>();
             int[] rows = {getLoc().row - 2, getLoc().row + 2};
@@ -290,6 +294,10 @@ public abstract class Piece {
     public static class Bishop extends Piece {
         public Bishop(Board board, BoardLoc loc) {
             super(board, loc, 'B');
+        }
+
+        public Bishop(Board board, BoardLoc loc, Team team) {
+            super(board, loc, team, 'B');
         }
 
         @Override public Set<BoardLoc> possibleMoves() {
@@ -379,6 +387,10 @@ public abstract class Piece {
     public static class Queen extends Piece {
         public Queen(Board board, BoardLoc loc) {
             super(board, loc, 'Q');
+        }
+
+        public Queen(Board board, BoardLoc loc, Team team) {
+            super(board, loc, team, 'Q');
         }
 
         @Override public Set<BoardLoc> possibleMoves() {

@@ -22,6 +22,7 @@ public class HumanPlayer implements Player {
      * in which the player makes his move
      */
     @Override public AbstractCommand move() {
+        // TODO print "check" if this put the computer in "check"
         return promptForInput();
     }
 
@@ -32,6 +33,8 @@ public class HumanPlayer implements Player {
     private AbstractCommand promptForInput() {
         System.out.println("your move::> ");
         String console = scanner.nextLine();
+        // TODO human player should be able to say "history" or something
+        // to print a summary of moves of the game so far
         if (console.equals("exit")) {
             System.out.println("Quitting.");
             System.exit(0);

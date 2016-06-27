@@ -24,13 +24,15 @@ public class CommandLineRenderer implements BoardRenderer {
             for (int col = 0; col < BOARD_WIDTH; col++) {
                 final char ch = startFromFirstPiece.charAt(col*PIECE_WIDTH);
                 if (ch != ' ') {
+                    char teamChar = startFromFirstPiece.charAt(col*PIECE_WIDTH+1);
+                    Team team = teamChar == 'b' ? Team.BLACK : Team.WHITE;
                     BoardLoc loc = BoardLoc.at(row, col);
-                    if (ch == 'R') toRet.add(new Piece.Rook(board, loc));
-                    else if (ch == 'P') toRet.add(new Piece.Pawn(board, loc));
-                    else if (ch == 'B') toRet.add(new Piece.Bishop(board, loc));
-                    else if (ch == 'N') toRet.add(new Piece.Knight(board, loc));
-                    else if (ch == 'Q') toRet.add(new Piece.Queen(board, loc));
-                    else if (ch == 'K') toRet.add(new Piece.King(board, loc));
+                    if (ch == 'R') toRet.add(new Piece.Rook(board, loc, team));
+                    else if (ch == 'P') toRet.add(new Piece.Pawn(board, loc, team));
+                    else if (ch == 'B') toRet.add(new Piece.Bishop(board, loc, team));
+                    else if (ch == 'N') toRet.add(new Piece.Knight(board, loc, team));
+                    else if (ch == 'Q') toRet.add(new Piece.Queen(board, loc, team));
+                    else if (ch == 'K') toRet.add(new Piece.King(board, loc, team));
                     else throw new RuntimeException("parse error, no piece has title: " + ch);
                 }
             }
