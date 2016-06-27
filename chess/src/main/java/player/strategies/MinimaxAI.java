@@ -1,4 +1,4 @@
-package ai.strategies;
+package player.strategies;
 
 import game.Board;
 import game.BoardCommand;

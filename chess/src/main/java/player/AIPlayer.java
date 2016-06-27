@@ -1,7 +1,7 @@
-package ai;
+package player;
 
-import ai.strategies.GreedyAI;
-import ai.strategies.Strategy;
+import player.strategies.GreedyAI;
+import player.strategies.Strategy;
 import game.AbstractCommand;
 import game.Board;
 import game.BoardCommand;

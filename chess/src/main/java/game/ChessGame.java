@@ -1,22 +1,23 @@
 package game;
 
 
-import ai.AIPlayer;
-import ai.HumanPlayer;
-import ai.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import player.AIPlayer;
+import player.HumanPlayer;
+import player.Player;
 
 import java.util.Scanner;
 import java.util.Set;
 
-/**
- * Ethan Petuchowski 7/7/15
- *
- * 11:00 got the idea to try this
+/* 11:00 got the idea to try this
  * 12:00 pawns are printing on the board
  * 12:30 all pieces are printing on the board
  * 1:00 basic command-line based piece-movement is working
+ */
+
+/**
+ * Ethan Petuchowski 7/7/15
  */
 public class ChessGame {
 
@@ -80,6 +81,13 @@ public class ChessGame {
         Player player2 = AIPlayer.newGreedyUniformAI(Team.BLACK, board);
         ChessGame game = new ChessGame(board, player1, player2);
         game.startInterpreter();
+    }
+
+    public static ChessGame fromPrintout(String rawLayoutString, Team firstMove) {
+        Board board = Board.fromPrintout(rawLayoutString);
+        Player player1 = AIPlayer.newGreedyUniformAI(Team.WHITE, board);
+        Player player2 = AIPlayer.newGreedyUniformAI(Team.BLACK, board);
+        return new ChessGame(board, player1, player2);
     }
 
     private void movePlayer(Player player) {

@@ -22,6 +22,16 @@ public class Pieces {
 
     private Pieces(Board board) {
         this.board = board;
+    }
+
+    private Pieces(String rawBoardString, Board board) {
+        this(board);
+        for (Piece piece : CommandLineRenderer.parseBoard(rawBoardString, board)) {
+            pieces.add(piece);
+        }
+    }
+
+    private void placePiecesInNormalPlaces(Board board) {
         placePawns(board);
         placeRooks(board);
         placeKnights(board);
@@ -32,12 +42,18 @@ public class Pieces {
 
     /** FACTORIES **/
     public static Pieces completeSet(Board board) {
-        return new Pieces(board);
+        Pieces ret = new Pieces(board);
+        ret.placePiecesInNormalPlaces(board);
+        return ret;
     }
 
     /** for testing */
     public static Pieces none() {
         return new Pieces();
+    }
+
+    public static Pieces fromPrintout(String rawBoardString, Board board) {
+        return new Pieces(rawBoardString, board);
     }
 
     private void placeQueens(Board board) {

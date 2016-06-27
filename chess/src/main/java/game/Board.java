@@ -1,7 +1,5 @@
 package game;
 
-import game.CommandLineRenderer.CoordinateCommandLineRenderer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,18 +15,22 @@ public class Board {
     /** FIELDS */
     private final Pieces pieces;
     private final Stack<StateChange> undoStack = new Stack<>();
-    private BoardRenderer boardRenderer = new CoordinateCommandLineRenderer(this);
+    private BoardRenderer boardRenderer = new CommandLineRenderer(this);
 
     // this looks like "bad form" with the whole "null" aspect
     private Board() {
-        this(null);
+        this.pieces = Pieces.completeSet(this);
     }
 
     private Board(Pieces pieces) {
-        if (pieces == null) {
-            this.pieces = Pieces.completeSet(this);
-        }
-        else this.pieces = pieces;
+        if (pieces == null) throw new NullPointerException(
+            "pieces was null; use the no-arg constructor instead"
+        );
+        this.pieces = pieces;
+    }
+
+    public Board(String rawLayoutString) {
+        this.pieces = Pieces.fromPrintout(rawLayoutString, this);
     }
 
     /** for testing */
@@ -39,6 +41,10 @@ public class Board {
     /** in effect, this is the main constructor (factory) */
     public static Board completeSet() {
         return new Board();
+    }
+
+    public static Board fromPrintout(String rawLayoutString) {
+        return new Board(rawLayoutString);
     }
 
     public boolean canUndoMove() {
@@ -64,8 +70,6 @@ public class Board {
         pieces.forceMove(command.from, command.to);
         if (addToStack) undoStack.add(new StateChange(killed, command));
     }
-
-    /** API */
 
     /**
      * Get a list of the moves for a given team
@@ -171,8 +175,6 @@ public class Board {
         AbstractCommand comm = AbstractCommand.parse(cmdStr);
         return execute((BoardCommand) comm);
     }
-
-    /* A BIG BAG OF ONE-LINERS */
 
     public Collection<Piece> livePiecesFor(Team team) {
         return pieces.livePieces(team);

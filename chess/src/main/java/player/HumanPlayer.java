@@ -1,4 +1,4 @@
-package ai;
+package player;
 
 import game.AbstractCommand;
 import game.Team;
