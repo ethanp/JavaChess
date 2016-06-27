@@ -1,5 +1,5 @@
-import game.BoardCommand;
 import game.Board;
+import game.BoardCommand;
 import game.BoardLoc;
 import game.ChessGame;
 import game.Piece;
@@ -20,15 +20,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class ChessGameTest {
 
-    ChessGame game;
+    private ChessGame game;
 
     @Before public void setup() {
         game = new ChessGame();
     }
 
     /**
-     * after moving, the board should be appropriately altered
-     * and the game should not yet be over
+     * after moving, the board should be appropriately altered and the game should not yet be over
      */
     @Test public void makeFirstMove() {
         BoardCommand firstMove = new BoardCommand(BoardLoc.at(6, 5), BoardLoc.at(5, 5)); // move pawn out
@@ -46,7 +45,7 @@ public class ChessGameTest {
     @Test public void foolsMate() {
         BoardCommand firstWhite = new BoardCommand(BoardLoc.at(6, 5), BoardLoc.at(5, 5)); // move pawn out
         BoardCommand firstBlack = new BoardCommand(BoardLoc.at(1, 4), BoardLoc.at(3, 4)); // move pawn out
-        BoardCommand scndWhite  = new BoardCommand(BoardLoc.at(6, 6), BoardLoc.at(4, 6)); // move other pawn
+        BoardCommand scndWhite = new BoardCommand(BoardLoc.at(6, 6), BoardLoc.at(4, 6)); // move other pawn
         BoardCommand scndBlack = new BoardCommand(BoardLoc.at(0, 3), BoardLoc.at(4, 7)); // move queen out
 
         assertFalse(game.won() || game.lost());
@@ -67,8 +66,8 @@ public class ChessGameTest {
     }
 
     /**
-     * If a piece can get in the way of a king in danger but the king has no available moves,
-     * the game should not be over, and irrelevant moves should NOT be available.
+     * If a piece can get in the way of a king in danger but the king has no available moves, the
+     * game should not be over, and irrelevant moves should NOT be available.
      */
     @Test public void saviour() {
         BoardCommand queenPawn = new BoardCommand(BoardLoc.at(6, 3), BoardLoc.at(5, 3));

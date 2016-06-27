@@ -14,22 +14,29 @@ import java.util.Stack;
  */
 public class Board {
 
+    /** FIELDS */
+    private final Pieces pieces;
+    private final Stack<StateChange> undoStack = new Stack<>();
+    private BoardRenderer boardRenderer = new CoordinateCommandLineRenderer(this);
+
     // this looks like "bad form" with the whole "null" aspect
     private Board() {
         this(null);
     }
 
-    public Board(Pieces pieces) {
+    private Board(Pieces pieces) {
         if (pieces == null) {
             this.pieces = Pieces.completeSet(this);
         }
         else this.pieces = pieces;
     }
 
+    /** for testing */
     public static Board empty() {
         return new Board(Pieces.none());
     }
 
+    /** in effect, this is the main constructor (factory) */
     public static Board completeSet() {
         return new Board();
     }
@@ -44,36 +51,21 @@ public class Board {
             && pieceAt.get().team == team;
     }
 
-    public static class StateChange {
-        final Optional<Piece> killedPiece;
-        public final BoardCommand command;
-        public StateChange(Optional<Piece> killedPiece, BoardCommand command) {
-            this.killedPiece = killedPiece;
-            this.command = command;
-        }
-    }
-
-    /** FIELDS */
-    private final Pieces pieces;
-    private BoardRenderer boardRenderer = new CoordinateCommandLineRenderer(this);
-    private final Stack<StateChange> undoStack = new Stack<>();
-
-    /** API */
-
     /**
-     * doesn't check whether the move is valid.
-     * for example we have to move pawns backwards.
+     * doesn't check whether the move is valid. for example we have to move pawns backwards.
      */
     public void forceExecute(BoardCommand command, boolean addToStack) {
         Optional<Piece> movedPiece = getPieceAt(command.from);
         if (!movedPiece.isPresent()) {
             // TODO replace with a logger.error(more of the relevant info)
-            throw new IllegalStateException("Can't execute, no one home at "+command.from);
+            throw new IllegalStateException("Can't execute, no one home at " + command.from);
         }
         Optional<Piece> killed = getPieceAt(command.to);
         pieces.forceMove(command.from, command.to);
         if (addToStack) undoStack.add(new StateChange(killed, command));
     }
+
+    /** API */
 
     /**
      * Get a list of the moves for a given team
@@ -93,7 +85,7 @@ public class Board {
         Optional<Piece> killedPiece = getPieceAt(command.to);
         Optional<Piece> movedPiece = getPieceAt(command.from);
         if (!movedPiece.isPresent()) {
-            System.err.println("No one home at "+command.from);
+            System.err.println("No one home at " + command.from);
             return Optional.empty();
         }
         pieces.moveFromTo(command.from, command.to);
@@ -132,10 +124,8 @@ public class Board {
     /**
      * Conditions for En Passant:
      *
-     * 1. We moved a pawn
-     * 2. No one was killed in the move
-     * 3. A piece is in the appropriate piece for en-passant capture
-     * 4. That piece is also a pawn
+     * 1. We moved a pawn 2. No one was killed in the move 3. A piece is in the appropriate piece
+     * for en-passant capture 4. That piece is also a pawn
      */
     private void killIfEnPassant(BoardCommand command, Optional<Piece> killedPiece, Optional<Piece> movedPiece) {
         if (!(movedPiece.get() instanceof Piece.Pawn)) return;
@@ -168,35 +158,73 @@ public class Board {
         /* special case for castling, we only undid the King, now un-move Rook too */
         Piece lastMovedPiece = getPieceAt(lastChange.command.from).get();
         boolean wasCastle = lastMovedPiece instanceof Piece.King
-                         && lastChange.command.distance() > 1;
+            && lastChange.command.distance() > 1;
         if (wasCastle) {
             undoMove();
         }
     }
-
-    /* A BIG BAG OF ONE-LINERS */
 
     /**
      * @throws ClassCastException if you don't give it a normal chess move like "E4 E5"
      */
     public Optional<Piece> execute(String cmdStr) {
         AbstractCommand comm = AbstractCommand.parse(cmdStr);
-        return execute((BoardCommand)comm);
+        return execute((BoardCommand) comm);
     }
 
-    public Collection<Piece> livePiecesFor(Team team)   { return pieces.livePieces(team); }
-    public Optional<Piece>  getPieceAt(BoardLoc loc)    { return pieces.getPieceAt(loc); }
-    public Piece.King       getKing(Team team)          { return pieces.getKing(team); }
-    public Iterable<Piece>  getLivePieces()             { return pieces.livePieces(); }
-    public void             draw()                      { boardRenderer.draw(); }
-    public boolean          hasPieceAt(BoardLoc at)     { return getPieceAt(at).isPresent(); }
-    public boolean          hasPieceAt(String str)      { return getPieceAt(BoardLoc.parse(str)).isPresent(); }
-    public boolean          hasPieceAt(int row, int col) { return hasPieceAt(BoardLoc.at(row, col)); }
-    public boolean          inCheck(Team team)          { return pieces.getKing(team).isThreatened(); }
-    public StateChange      lastMove()                  { return undoStack.isEmpty() ? null : undoStack.peek(); }
-    public Piece            lastPieceMoved()            { return undoStack.isEmpty() ? null : getPieceAt(undoStack.peek().command.to).get(); }
-    public boolean          hasLegalMoves(Team team)    { return livePiecesFor(team).stream().anyMatch(Piece::hasMoves); }
-    public void             forceResetPiecesTo(Set<Piece> pieces) { this.pieces.forceResetPiecesTo(pieces); }
+    /* A BIG BAG OF ONE-LINERS */
+
+    public Collection<Piece> livePiecesFor(Team team) {
+        return pieces.livePieces(team);
+    }
+
+    public Optional<Piece> getPieceAt(BoardLoc loc) {
+        return pieces.getPieceAt(loc);
+    }
+
+    public Piece.King getKing(Team team) {
+        return pieces.getKing(team);
+    }
+
+    public Iterable<Piece> getLivePieces() {
+        return pieces.livePieces();
+    }
+
+    public void draw() {
+        boardRenderer.draw();
+    }
+
+    public boolean hasPieceAt(BoardLoc at) {
+        return getPieceAt(at).isPresent();
+    }
+
+    public boolean hasPieceAt(String str) {
+        return getPieceAt(BoardLoc.parse(str)).isPresent();
+    }
+
+    public boolean hasPieceAt(int row, int col) {
+        return hasPieceAt(BoardLoc.at(row, col));
+    }
+
+    public boolean inCheck(Team team) {
+        return pieces.getKing(team).isThreatened();
+    }
+
+    public StateChange lastMove() {
+        return undoStack.isEmpty() ? null : undoStack.peek();
+    }
+
+    public Piece lastPieceMoved() {
+        return undoStack.isEmpty() ? null : getPieceAt(undoStack.peek().command.to).get();
+    }
+
+    public boolean hasLegalMoves(Team team) {
+        return livePiecesFor(team).stream().anyMatch(Piece::hasMoves);
+    }
+
+    public void forceResetPiecesTo(Set<Piece> pieces) {
+        this.pieces.forceResetPiecesTo(pieces);
+    }
 
     /**
      * @return true iff the other team could attack this location on their next turn
@@ -205,8 +233,8 @@ public class Board {
         return pieces.livePieces(team.other()).stream()
             .anyMatch(p -> {
 
-                // this is "ugly" to make debugging `.possibleMoves()` easier
-                boolean threatens = false;
+                    // this is "ugly" to make debugging `.possibleMoves()` easier
+                    boolean threatens = false;
 
                 /* Same logic for king would cause infinite recursion
                  * bc finding a King's `possibleMoves` requires determining
@@ -214,16 +242,26 @@ public class Board {
                  * may not be strictly correct for all cases, but it's definitely
                  * pretty close & "close enough".
                  */
-                if (p instanceof Piece.King) {
-                    threatens = ((Piece.King) p).withinOneSquareOf(loc);
+                    if (p instanceof Piece.King) {
+                        threatens = ((Piece.King) p).withinOneSquareOf(loc);
+                    }
+                    else {
+                        Set<BoardLoc> moveSet = p.possibleMoves();
+                        threatens = moveSet.contains(loc);
+                    }
+                    return threatens;
                 }
-                else {
-                    Set<BoardLoc> moveSet = p.possibleMoves();
-                    threatens = moveSet.contains(loc);
-                }
-                return threatens;
-            }
-        );
+            );
+    }
+
+    public static class StateChange {
+        public final BoardCommand command;
+        final Optional<Piece> killedPiece;
+
+        public StateChange(Optional<Piece> killedPiece, BoardCommand command) {
+            this.killedPiece = killedPiece;
+            this.command = command;
+        }
     }
 
 }

@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class HumanPlayer implements Player {
 
     final private Scanner scanner;
-    final Team team;
+    private final Team team;
 
     public HumanPlayer(Team team, Scanner scanner) {
         this.team = team;
@@ -30,7 +30,7 @@ public class HumanPlayer implements Player {
     }
 
     private AbstractCommand promptForInput() {
-        System.out.println("Make your move:");
+        System.out.println("your move::> ");
         String console = scanner.nextLine();
         if (console.equals("exit")) {
             System.out.println("Quitting.");

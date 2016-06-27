@@ -14,6 +14,10 @@ public class BoardCommand extends AbstractCommand {
         this.to = to;
     }
 
+    public static game.BoardCommand empty() {
+        return new game.BoardCommand(BoardLoc.at(0, 0), BoardLoc.at(0, 0));
+    }
+
     /**
      * Note: calling this will not in itself restore any pieces that were eaten by the original
      * move
@@ -24,16 +28,12 @@ public class BoardCommand extends AbstractCommand {
 
     public int distance() {
         return Math.max(
-            Math.abs(from.row-to.row),
-            Math.abs(from.col-to.col)
+            Math.abs(from.row - to.row),
+            Math.abs(from.col - to.col)
         );
     }
 
     @Override public String toString() {
-        return from+" - "+to;
-    }
-
-    public static game.BoardCommand empty() {
-        return new game.BoardCommand(BoardLoc.at(0, 0), BoardLoc.at(0, 0));
+        return from + " - " + to;
     }
 }

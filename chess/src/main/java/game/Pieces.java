@@ -11,53 +11,72 @@ import java.util.stream.Collectors;
  */
 public class Pieces {
 
-    private Set<Piece> pieces = new HashSet<>();
-
     @SuppressWarnings("unused")
     private final Board board;
+    private Set<Piece> pieces = new HashSet<>();
 
-    /** FACTORIES **/
-    public static Pieces completeSet(Board board) {
-        return new Pieces(board);
-    }
-
-    public static Pieces none() {
-        return new Pieces();
-    }
-
-    /** this is for the testing purposes */
+    /** for testing */
     private Pieces() {
         this.board = null; // won't be needing this
     }
 
     private Pieces(Board board) {
         this.board = board;
-        for (int i = 0; i < 4; i++)
-            for (BoardLoc loc : BoardLoc.corners(1, i))
-                pieces.add(new Piece.Pawn(board, loc));
+        placePawns(board);
+        placeRooks(board);
+        placeKnights(board);
+        placeBishops(board);
+        placeKings(board);
+        placeQueens(board);
+    }
 
-        for (BoardLoc loc : BoardLoc.corners(0, 0))
-            pieces.add(new Piece.Rook(board, loc));
+    /** FACTORIES **/
+    public static Pieces completeSet(Board board) {
+        return new Pieces(board);
+    }
 
-        for (BoardLoc loc : BoardLoc.corners(0, 1))
-            pieces.add(new Piece.Knight(board, loc));
+    /** for testing */
+    public static Pieces none() {
+        return new Pieces();
+    }
 
-        for (BoardLoc loc : BoardLoc.corners(0, 2))
-            pieces.add(new Piece.Bishop(board, loc));
-
-        BoardLoc whiteKingLoc = BoardLoc.at(0, 4);
-        pieces.add(new Piece.King(board, whiteKingLoc));
-        pieces.add(new Piece.King(board, whiteKingLoc.mirror()));
-
+    private void placeQueens(Board board) {
         BoardLoc whiteQueenLoc = BoardLoc.at(0, 3);
         pieces.add(new Piece.Queen(board, whiteQueenLoc));
         pieces.add(new Piece.Queen(board, whiteQueenLoc.mirror()));
     }
 
+    private void placeKings(Board board) {
+        BoardLoc whiteKingLoc = BoardLoc.at(0, 4);
+        pieces.add(new Piece.King(board, whiteKingLoc));
+        pieces.add(new Piece.King(board, whiteKingLoc.mirror()));
+    }
+
+    private void placeBishops(Board board) {
+        for (BoardLoc loc : BoardLoc.corners(0, 2))
+            pieces.add(new Piece.Bishop(board, loc));
+    }
+
+    private void placeKnights(Board board) {
+        for (BoardLoc loc : BoardLoc.corners(0, 1))
+            pieces.add(new Piece.Knight(board, loc));
+    }
+
+    private void placeRooks(Board board) {
+        for (BoardLoc loc : BoardLoc.corners(0, 0))
+            pieces.add(new Piece.Rook(board, loc));
+    }
+
+    private void placePawns(Board board) {
+        for (int i = 0; i < 4; i++)
+            for (BoardLoc loc : BoardLoc.corners(1, i))
+                pieces.add(new Piece.Pawn(board, loc));
+    }
+
     public List<Piece> livePieces() {
         return pieces.stream()
-                .filter(Piece::isAlive)
-                .collect(Collectors.toList());
+            .filter(Piece::isAlive)
+            .collect(Collectors.toList());
     }
 
     public List<Piece> livePieces(Team team) {
@@ -88,7 +107,7 @@ public class Pieces {
                 t.get().kill();
             f.get().move(to);
         }
-        else throw new RuntimeException("there is no piece at "+from);
+        else throw new RuntimeException("there is no piece at " + from);
     }
 
     public Piece.King getKing(Team team) {

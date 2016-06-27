@@ -21,7 +21,8 @@ public abstract class AbstractCommand {
         private static final UndoCommandSingleton instance = new UndoCommandSingleton();
 
         // private constructor to avoid client applications to use constructor
-        private UndoCommandSingleton(){}
+        private UndoCommandSingleton() {
+        }
 
         public static UndoCommandSingleton getInstance() {
             return instance;
@@ -31,5 +32,4 @@ public abstract class AbstractCommand {
             return "UndoCommandSingleton";
         }
     }
-
 }

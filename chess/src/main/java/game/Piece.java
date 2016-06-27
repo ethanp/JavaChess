@@ -10,14 +10,13 @@ import java.util.stream.Collectors;
  */
 public abstract class Piece {
 
-    /**
-     * must be implemented by each type of chess piece
-     *
-     * @return set of legal locations for this piece to move to on this turn,
-     *         given which team its own and where other pieces are on the board
-     */
-    public abstract Set<BoardLoc> possibleMoves();
-
+    public final Team team;
+    /** FIELDS */
+    final Board board;
+    private final char symbol;
+    protected boolean hasMoved; // both king and rook NEED it, plus good for debugging
+    private BoardLoc loc;
+    private boolean alive;
     private Piece(Board board, BoardLoc loc, Team team, char symbol) {
         this.loc = loc;
         this.team = team;
@@ -25,41 +24,54 @@ public abstract class Piece {
         this.alive = true;
         this.symbol = symbol;
     }
-
     public Piece(Board board, BoardLoc loc, char symbol) {
         this(board, loc, loc.getTerritory(), symbol);
     }
 
-    /** FIELDS */
-    final           Board     board;
-    private         BoardLoc  loc;
-    public final    Team      team;
-    private         boolean   alive;
-    private final   char      symbol;
-    protected       boolean   hasMoved; // both king and rook NEED it, plus good for debugging
+    /**
+     * must be implemented by each type of chess piece
+     * @return set of legal locations for this piece to move to on this turn, given which team its
+     * own and where other pieces are on the board
+     */
+    public abstract Set<BoardLoc> possibleMoves();
 
     /** SHORT UTILITIES */
 
     /**
      * used to draw the character on the board using asci
      */
-    public  String repr(){ return symbol+team.getRepr(); }
+    public String repr() {
+        return symbol + team.getRepr();
+    }
 
-    public  BoardLoc getLoc()               { return loc; }
-    public  boolean  isAlive()              { return alive; }
-    public  void     kill()                 { alive = false; }
-    private void     setLoc(BoardLoc loc)   { this.loc = loc; }
-    public  boolean  hasMoves()             { return !possibleMoves().isEmpty(); }
+    public BoardLoc getLoc() {
+        return loc;
+    }
 
-    public  boolean  moveInvalid(BoardLoc to) {
+    private void setLoc(BoardLoc loc) {
+        this.loc = loc;
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void kill() {
+        alive = false;
+    }
+
+    public boolean hasMoves() {
+        return !possibleMoves().isEmpty();
+    }
+
+    public boolean moveInvalid(BoardLoc to) {
         return !to.onBoard()
             || !possibleMoves().contains(to);
     }
 
     /**
-     * For a King, this may also be called by the King's special `isThreatened`
-     * method, which is called before every turn (all the way up at
-     * `startInterpreter`) to see if the game is over.
+     * For a King, this may also be called by the King's special `isThreatened` method, which is
+     * called before every turn (all the way up at `startInterpreter`) to see if the game is over.
      */
     public void setHasMoved() {
         hasMoved = true;
@@ -70,13 +82,13 @@ public abstract class Piece {
     }
 
     /**
-     * Places this piece on the board at the given location, replacing the current
-     * location the piece is set to be at. If the piece was dead, it will be
-     * restored to full health by moving it onto the board.
+     * Places this piece on the board at the given location, replacing the current location the
+     * piece is set to be at. If the piece was dead, it will be restored to full health by moving it
+     * onto the board.
      */
     public void move(BoardLoc to) {
         if (moveInvalid(to)) {
-            System.err.println("invalid move from: "+getLoc()+" to: "+to);
+            System.err.println("invalid move from: " + getLoc() + " to: " + to);
         }
         alive = true;
         setHasMoved();
@@ -89,7 +101,7 @@ public abstract class Piece {
      */
     public void forceMove(BoardLoc to) {
         if (!to.onBoard()) { // don't check if this move is valid for this piece
-            throw new IllegalStateException(to+ " is not on the board.");
+            throw new IllegalStateException(to + " is not on the board.");
         }
         alive = true;
         // TODO how am I going to UNSET `hasMoved`?
@@ -100,18 +112,18 @@ public abstract class Piece {
 
     BoardLoc forward(int spaces) {
         return team == Team.BLACK
-             ? BoardLoc.at(loc.row+spaces, loc.col)
-             : BoardLoc.at(loc.row-spaces, loc.col);
+            ? BoardLoc.at(loc.row + spaces, loc.col)
+            : BoardLoc.at(loc.row - spaces, loc.col);
     }
 
     /* used by queen and rook */
     @SuppressWarnings("StatementWithEmptyBody")
     Set<BoardLoc> straightMoves() {
         Set<BoardLoc> locSet = new HashSet<>();
-        for (int r = getLoc().row-1; r >= 0 && addLogic(r, getLoc().col, locSet); r--);
-        for (int r = getLoc().row+1; r < 8  && addLogic(r, getLoc().col, locSet); r++);
-        for (int c = getLoc().col-1; c >= 0 && addLogic(getLoc().row, c, locSet); c--);
-        for (int c = getLoc().col+1; c < 8  && addLogic(getLoc().row, c, locSet); c++);
+        for (int r = getLoc().row - 1; r >= 0 && addLogic(r, getLoc().col, locSet); r--) ;
+        for (int r = getLoc().row + 1; r < 8 && addLogic(r, getLoc().col, locSet); r++) ;
+        for (int c = getLoc().col - 1; c >= 0 && addLogic(getLoc().row, c, locSet); c--) ;
+        for (int c = getLoc().col + 1; c < 8 && addLogic(getLoc().row, c, locSet); c++) ;
         return locSet;
     }
 
@@ -120,33 +132,44 @@ public abstract class Piece {
         Set<BoardLoc> locSet = new HashSet<>();
         int r, c;
 
-        r = getLoc().row-1;
-        c = getLoc().col-1;
-        while (r >= 0 && c >= 0 && addLogic(r, c, locSet)) { r--; c--; }
+        r = getLoc().row - 1;
+        c = getLoc().col - 1;
+        while (r >= 0 && c >= 0 && addLogic(r, c, locSet)) {
+            r--;
+            c--;
+        }
 
-        r = getLoc().row+1;
-        c = getLoc().col+1;
-        while (r < 8 && c < 8 && addLogic(r, c, locSet)) { r++; c++; }
+        r = getLoc().row + 1;
+        c = getLoc().col + 1;
+        while (r < 8 && c < 8 && addLogic(r, c, locSet)) {
+            r++;
+            c++;
+        }
 
-        r = getLoc().row+1;
-        c = getLoc().col-1;
-        while (r < 8 && c >= 0 && addLogic(r, c, locSet)) { r++; c--; }
+        r = getLoc().row + 1;
+        c = getLoc().col - 1;
+        while (r < 8 && c >= 0 && addLogic(r, c, locSet)) {
+            r++;
+            c--;
+        }
 
-        r = getLoc().row-1;
-        c = getLoc().col+1;
-        while (r >= 0 && c < 8  && addLogic(r, c, locSet)) { r--; c++; }
+        r = getLoc().row - 1;
+        c = getLoc().col + 1;
+        while (r >= 0 && c < 8 && addLogic(r, c, locSet)) {
+            r--;
+            c++;
+        }
 
         return locSet;
     }
 
     /**
      * Adds the location if it is either empty or the opponent's piece is occupying it
-     *
      * @return true iff the slot was empty
      *
-     * The point is that for a piece who can move up to N tiles in some direction,
-     * will continue iterating through the tiles until addLogic == true. This way
-     * it is simple to use in a for-loop, e.g. see the `straightMoves` function above.
+     * The point is that for a piece who can move up to N tiles in some direction, will continue
+     * iterating through the tiles until addLogic == true. This way it is simple to use in a
+     * for-loop, e.g. see the `straightMoves` function above.
      */
     boolean addLogic(BoardLoc loc, Set<BoardLoc> locSet) {
         if (!loc.onBoard()) return true;
@@ -201,8 +224,8 @@ public abstract class Piece {
 
         boolean inHomeRow() {
             return team == Team.BLACK
-                 ? getLoc().row == 1
-                 : getLoc().row == 6;
+                ? getLoc().row == 1
+                : getLoc().row == 6;
         }
 
         @Override public Set<BoardLoc> possibleMoves() {
@@ -254,10 +277,10 @@ public abstract class Piece {
 
         @Override public Set<BoardLoc> possibleMoves() {
             Set<BoardLoc> locSet = new HashSet<>();
-            int[] rows = { getLoc().row-2, getLoc().row+2 };
-            int[] rowV = { getLoc().col-1, getLoc().col+1 };
-            int[] cols = { getLoc().col-2, getLoc().col+2 };
-            int[] colV = { getLoc().row-1, getLoc().row+1 };
+            int[] rows = {getLoc().row - 2, getLoc().row + 2};
+            int[] rowV = {getLoc().col - 1, getLoc().col + 1};
+            int[] cols = {getLoc().col - 2, getLoc().col + 2};
+            int[] colV = {getLoc().row - 1, getLoc().row + 1};
             for (int r : rows) for (int v : rowV) addLogic(r, v, locSet);
             for (int c : cols) for (int v : colV) addLogic(v, c, locSet);
             return locSet;
@@ -278,15 +301,23 @@ public abstract class Piece {
         public King(Board board, BoardLoc loc) {
             super(board, loc, 'K');
         }
+
         public King(Board board, BoardLoc loc, Team team) {
             super(board, loc, team, 'K');
+        }
+
+        private static boolean castleValid(boolean sideIsEmpty, Optional<Piece> rookOpt) {
+            return sideIsEmpty
+                && rookOpt.isPresent()
+                && rookOpt.get() instanceof Rook
+                && !rookOpt.get().hasMoved;
         }
 
         @Override public Set<BoardLoc> possibleMoves() {
             Set<BoardLoc> locSet = new HashSet<>();
             for (int i = -1; i <= 1; i++)
                 for (int j = -1; j <= 1; j++)
-                    addLogic(getLoc().row+i, getLoc().col+j, locSet);
+                    addLogic(getLoc().row + i, getLoc().col + j, locSet);
 
             locSet = locSet.stream()
                 .filter(loc -> !board.isThreatened(team, loc))
@@ -322,13 +353,6 @@ public abstract class Piece {
             return locSet;
         }
 
-        private static boolean castleValid(boolean sideIsEmpty, Optional<Piece> rookOpt) {
-            return sideIsEmpty
-                && rookOpt.isPresent()
-                && rookOpt.get() instanceof Rook
-                && !rookOpt.get().hasMoved;
-        }
-
         boolean isThreatened() {
             boolean threatened = board.isThreatened(team, getLoc());
             if (threatened) {
@@ -338,15 +362,15 @@ public abstract class Piece {
         }
 
         /**
-         * @return `true` iff @param `loc` is one of the 9 squares
-         *          surrounding and containing `this` Piece
+         * @return `true` iff @param `loc` is one of the 9 squares surrounding and containing `this`
+         * Piece
          */
         public boolean withinOneSquareOf(BoardLoc loc) {
             final int row = getLoc().row;
             final int col = getLoc().col;
             for (int i = -1; i <= 1; i++)
                 for (int j = -1; j <= 1; j++)
-                    if (BoardLoc.at(row+i, col+j).equals(loc))
+                    if (BoardLoc.at(row + i, col + j).equals(loc))
                         return true;
             return false;
         }
@@ -365,9 +389,18 @@ public abstract class Piece {
     }
 
     public static class ZERO_VALUE extends Piece {
-        private ZERO_VALUE() { super(null, null, '0'); }
-        @Override public Set<BoardLoc> possibleMoves() { return null; }
         static ZERO_VALUE instance = new ZERO_VALUE();
-        public static ZERO_VALUE instance() { return instance; }
+
+        private ZERO_VALUE() {
+            super(null, null, '0');
+        }
+
+        public static ZERO_VALUE instance() {
+            return instance;
+        }
+
+        @Override public Set<BoardLoc> possibleMoves() {
+            return null;
+        }
     }
 }

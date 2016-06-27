@@ -20,29 +20,22 @@ import java.util.Set;
  */
 public class ChessGame {
 
-    /** MAIN **/
 
-    static final Logger logger = LoggerFactory.getLogger(ChessGame.class);
-
-    public static void main(String[] args) {
-//        ChessGame.humanVsGreedyAI();
-        ChessGame.greedyAI_v_greedyAI();
-    }
-
+    private static final Logger logger = LoggerFactory.getLogger(ChessGame.class);
+    private static final Scanner STDIN_scanner = new Scanner(System.in);
 
     /** FIELDS **/
 
     public final Board board;
-    private static final Scanner STDIN_scanner = new Scanner(System.in);
     private final Player player1;
     private final Player player2;
-
 
     /** CONSTRUCTORS **/
 
     public ChessGame() {
         this(Board.completeSet());
     }
+
 
     public ChessGame(Board board) {
         this.board = board;
@@ -56,6 +49,12 @@ public class ChessGame {
         this.player2 = player2;
     }
 
+    /** MAIN **/
+
+    public static void main(String[] args) {
+        ChessGame.humanVsGreedyAI();
+//        ChessGame.greedyAI_v_greedyAI();
+    }
 
     /** FACTORIES **/
 
@@ -67,6 +66,7 @@ public class ChessGame {
     /** METHODS **/
 
     private static void humanVsGreedyAI() {
+        System.out.println("Type 'exit' to quit the game.");
         Board board = Board.completeSet();
         Player player1 = new HumanPlayer(Team.WHITE, STDIN_scanner);
         Player player2 = AIPlayer.newGreedyUniformAI(Team.BLACK, board);
@@ -134,9 +134,8 @@ public class ChessGame {
     }
 
     /**
-     * What if another piece is able to get in-the-way of the attacker?
-     * So iterate through possible moves of each of the pieces,
-     * and check if still in "check".
+     * What if another piece is able to get in-the-way of the attacker? So iterate through possible
+     * moves of each of the pieces, and check if still in "check".
      */
     boolean isSaviour(Team team) {
         boolean canBeSaved = false;

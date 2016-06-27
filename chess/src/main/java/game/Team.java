@@ -6,6 +6,7 @@ package game;
 public enum Team {
     BLACK("b"), WHITE("w");
     private String repr;
+
     Team(String repr) {
         this.repr = repr;
     }

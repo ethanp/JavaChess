@@ -11,9 +11,9 @@ import game.Team;
  * An AI Strategy that chooses moves based on running
  */
 public class MinimaxAI implements Strategy {
+    static final int SEARCH_DEPTH = 2;
     final Board board;
     final Team team;
-    static final int SEARCH_DEPTH = 2;
     BoardEvaluator boardEvaluator;
 
     public MinimaxAI(Board board, Team team) {
@@ -29,14 +29,12 @@ public class MinimaxAI implements Strategy {
     /**
      * Choose the move that scores highest according to minimax
      *
-     * ```scala
-     * moves.groupBy(minimax).maxBy(_._1)._2.head
-     * ```
+     * ```scala moves.groupBy(minimax).maxBy(_._1)._2.head ```
      */
     @Override public BoardCommand chooseMove() {
         BoardCommand bestMove = null;
         double bestVal = Double.NEGATIVE_INFINITY;
-        for(BoardCommand curMove : board.getMovesFor(team)) {
+        for (BoardCommand curMove : board.getMovesFor(team)) {
             double curVal = minimax(curMove);
             if (curVal > bestVal) {
                 bestMove = curMove;
@@ -62,11 +60,12 @@ public class MinimaxAI implements Strategy {
     private double minimax(int curDepth, boolean maximize) {
         if (curDepth == SEARCH_DEPTH) {
             return boardEvaluator.evaluate(board);
-        } else {
+        }
+        else {
             double bestScore = 0;
             for (BoardCommand move : board.getMovesFor(team)) {
                 board.execute(move);
-                double score = minimax(curDepth+1, !maximize);
+                double score = minimax(curDepth + 1, !maximize);
                 bestScore = maximize
                     ? Math.max(score, bestScore)
                     : Math.min(score, bestScore);

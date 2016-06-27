@@ -1,5 +1,6 @@
 package ai;
 
+import ai.strategies.GreedyAI;
 import ai.strategies.Strategy;
 import game.AbstractCommand;
 import game.Board;
@@ -11,9 +12,9 @@ import game.Team;
  */
 public class AIPlayer implements Player {
 
+    private final Team team;
     private final Board board;
     private Strategy strategy;
-    final Team team;
 
     public AIPlayer(Team team, Board board, Strategy strategy) {
         this.board = board;
@@ -21,10 +22,10 @@ public class AIPlayer implements Player {
         this.strategy = strategy;
     }
 
-//    public static AIPlayer newGreedyUniformAI(Team team, Board board) {
-//        new AIPlayer(team, board, new GreedyAI(tea, Strategy.PieceEvaluator.uniform()))
-//        return ;
-//    }
+    public static AIPlayer newGreedyUniformAI(Team team, Board board) {
+        GreedyAI evaluator = new GreedyAI(team, board, Strategy.PieceEvaluator.uniform());
+        return new AIPlayer(team, board, evaluator);
+    }
 
     /**
      * in which the opponent makes his move

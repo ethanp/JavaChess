@@ -11,32 +11,20 @@ import org.slf4j.LoggerFactory;
  * Ethan Petuchowski 8/24/15
  */
 public interface Strategy {
-    BoardCommand chooseMove();
-
     /* static final (implicitly [it's a Java thing]) */
     Logger STRATEGY_LOGGER = LoggerFactory.getLogger(Strategy.class);
-
-    class AIMove {
-        final BoardCommand command;
-        final double value;
-
-        public AIMove(BoardCommand command, double value) {
-            this.command = command;
-            this.value = value;
-        }
-    }
+    BoardCommand chooseMove();
 
     interface PieceEvaluator {
+        static UniformEvaluator uniform() {
+            return new UniformEvaluator();
+        }
         int valueOf(Piece p);
 
         class UniformEvaluator implements PieceEvaluator {
             @Override public int valueOf(Piece p) {
                 return 5;
             }
-        }
-
-        static UniformEvaluator uniform() {
-            return new UniformEvaluator();
         }
 
         class TextbookEvaluator implements PieceEvaluator {
@@ -55,19 +43,27 @@ public interface Strategy {
         }
     }
 
+    class AIMove {
+        final BoardCommand command;
+        final double value;
+
+        public AIMove(BoardCommand command, double value) {
+            this.command = command;
+            this.value = value;
+        }
+    }
 
     /**
      * Ethan Petuchowski 9/22/15
      */
     abstract class BoardEvaluator {
         final Team team;
+        final PieceEvaluator pieceEvaluator;
 
         protected BoardEvaluator(Team team, PieceEvaluator evaluator) {
             this.team = team;
             this.pieceEvaluator = evaluator;
         }
-
-        final PieceEvaluator pieceEvaluator;
 
         BoardEvaluator(Team team) {
             this(team, new PieceEvaluator.TextbookEvaluator());
@@ -81,7 +77,9 @@ public interface Strategy {
 
         static class EvaluateByPieces extends BoardEvaluator {
 
-            EvaluateByPieces(Team team) { super(team); }
+            EvaluateByPieces(Team team) {
+                super(team);
+            }
 
             @Override public double evaluate(Board board) {
                 double sum = 0;
